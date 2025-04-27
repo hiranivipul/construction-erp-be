@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"],
+            "@routes/*": ["routes/*"],
+            "@database/*": ["src/database/*"],
+            "@utils/*": ["src/utils/*"],
+            "@types/*": ["types/*"],
+            "@modules/*": ["modules/*"]
+        },
+        "esModuleInterop": true,
+        "typeRoots": ["node_modules/@types"],
+        "strict": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "lib": ["esnext", "dom"],
+        "noImplicitAny": false,
+        "noEmitOnError": false,
+        "allowSyntheticDefaultImports": true
+    },
+    "include": ["src/**/*.ts", "src/database/models/index.ts"],
+    "exclude": ["node_modules"]
+}

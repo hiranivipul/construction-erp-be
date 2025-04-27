@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Sending.ac - Invite Email</title>
+
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+            font-family: "Montserrat", sans-serif;
+        }
+
+        :root {
+            --primary-color: #00173C;
+            --fade-text-color: #7F8684;
+            --white-color: #FFFFFF;
+            --border-color: rgba(0, 23, 60, 0.15);
+            --background-gradient: linear-gradient(180deg, #FCF3BA 0%, #FFFFFF 100%);
+            --secondary-background-gradient: linear-gradient(180deg, #FEEDA2 50%, #FFE78A 100%);
+            --yellow-color: #FFE78A;
+        }
+
+        body {
+            background: var(--background-gradient) no-repeat;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        header h1 span {
+            font-weight: 500;
+        }
+
+        /* Main Wrapper */
+        main {
+            width: 100%;
+        }
+
+        .main-wrapper {
+            max-width: 1320px;
+            width: 100%;
+            margin: 0px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 80px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        /* Celebrate Section */
+        #celebrate {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        #celebrate img {
+            width: 100px;
+        }
+
+        #celebrate h2 {
+            font-size: 48px;
+            font-weight: 900;
+        }
+
+
+        /* Create Account Section */
+        #createAccount {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        #createAccount h2 {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        #createAccount h2 span {
+            font-weight: 900;
+        }
+
+        .button-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .button-content button {
+            width: 440px;
+            height: 60px;
+            background: var(--primary-color);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--white-color);
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button-content p {
+            font-size: 18px;
+            color: var(--fade-text-color);
+        }
+
+        /* Highlight Section */
+        .highlight {
+            max-width: 560px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--white-color);
+        }
+
+        .highlight span {
+            font-weight: 500;
+            color: var(--fade-text-color);
+        }
+
+        /* Footer Section */
+        footer {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .footer-wrapper {
+            max-width: 1320px;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-wrapper p {
+            font-size: 14px;
+            color: var(--fade-text-color);
+            text-align: left;
+        }
+
+        .footer-wrapper a {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+
+
+        #celebrate p {
+            font-weight: 500;
+            font-size: 18px;
+            line-height: 24px;
+            text-align: center;
+            color: var(--fade-text-color);
+
+        }
+
+
+        .step .number {
+            width: 60px;
+            height: 60px;
+            border-radius: 99px;
+            background: var(--yellow-color);
+            font-family: Arial;
+            font-weight: 700;
+            font-size: 36px;
+            line-height: 24px;
+            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .btnNotes .note br {
+            display: none;
+        }
+
+        main .cta-btn {
+            width: 440px;
+            height: 60px;
+            border-radius: 12px;
+            padding: 12px 48px;
+            background: var(--primary-color);
+            box-shadow: 0px 3px 9px 0px #00000017;
+            color: var(--white-color);
+            font-size: 24px;
+            line-height: 24px;
+            text-align: center;
+            font-weight: 700;
+
+        }
+
+        .video-wrapper h3 {
+            font-weight: 700;
+            font-size: 24px;
+            line-height: 24px;
+            text-align: center;
+            color: var(--fade-text-color);
+
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            max-height: 271px;
+            border-radius: 30px;
+        }
+
+        .confirmYourApplication {
+            background: var(--secondary-background-gradient);
+            box-shadow: 0px 4px 4px 0px #00000040;
+            padding: 45px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .highlightQA {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .highlightQA h2 {
+            font-weight: 800;
+            font-size: 34px;
+            line-height: 100%;
+            text-align: left;
+            color: var(--primary-color);
+
+        }
+
+        .highlightQA p {
+            font-weight: 500;
+            font-size: 20px;
+            text-align: left;
+            margin-left: 30px;
+            color: var(--primary-color);
+        }
+        #createAccount .headingConfirmSection {
+            font-weight: 700;
+            font-size: 34px;
+            line-height: 100%;
+            text-align: center;
+        }
+
+        #createAccount .headingConfirmSection span {
+            font-weight: 600;
+            color: #00173C80;
+        }
+        #celebrate Span{
+            font-size: 100px;
+            line-height: 100%;
+        }
+        #createAccount .ForgotitSection span{
+            font-weight: 900;
+            font-size: 34px;
+            color: var(--primary-color);
+        }
+
+        .paymentDecline span{
+            color:#000000;
+        }
+        @media only screen and (max-width: 575px) {
+            .main-wrapper {
+                padding: 30px 15px;
+            }
+
+            #createAccount h2 {
+                font-size: 24px;
+                line-height: 1.4;
+            }
+
+            #createAccount h2 br {
+                display: none;
+            }
+
+            #createAccount button {
+                width: 240px;
+                height: 50px;
+                font-size: 18px;
+            }
+
+            .button-content p br {
+                display: none;
+            }
+
+            .highlight {
+                width: 90%;
+                font-size: 16px;
+                padding: 20px;
+            }
+
+            .footer-wrapper {
+                padding: 20px;
+            }
+
+            .firstNote br {
+                display: none;
+            }
+
+
+            main .cta-btn {
+                width: 100%;
+            }
+
+            .video-wrapper br {
+                display: none;
+
+            }
+
+            #celebrate p br {
+                display: none;
+            }
+
+            #celebrate .Welcome-heading {
+                font-size: 30px;
+            }
+
+            .highlightQA {
+                gap: 20px;
+            }
+
+            .highlightQA h2 {
+                font-weight: 800;
+                font-size: 20px;
+                line-height: 100%;
+            }
+
+            .highlightQA p {
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 20px;
+
+            }
+            #celebrate .ChangedStyleName{
+                font-size: 30px;
+                line-height: 36px;
+            }
+            #createAccount .headingConfirmSection {
+                font-size: 20px;
+                line-height: 30px;
+                text-align: center;
+            }
+
+            #createAccount .headingConfirmSection span {
+                font-weight: 600;
+                font-size: 20px;
+                color: #00173C80;
+            }
+            #celebrate .paymentfailed{
+                font-size: 34px;
+            }
+
+        }
+    </style>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1>sending<span>.ac</span></h1>
+    </header>
+
+    <main>
+        <div class="main-wrapper">
+            
+            <!-- Celebration Section -->
+            <section id="celebrate">
+                <span>&#128071;</span>
+                <h2 class="ChangedStyleName">{{name}}, you’re almost there...</h2>
+            </section>
+
+            <!-- Invitation Section -->
+            <section id="createAccount">
+                <h2 class="headingConfirmSection">
+                    Please confirm your application<br>
+                    <span>(if you don’t, you will be rejected automatically)</span>
+                </h2>
+                
+                <div class="button-content">
+                    <a target="_blank" class="cta-btn" href="{{confirm_url}}">Confirm my application</a>
+                    <p>
+                        Once confirmed, we’ll keep you updated on the <br>
+                        beta launch and your application status.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Highlight Section -->
+            <div class="highlight confirmYourApplication">
+                <div class="highlightQA">
+                    <h2>How soon can I join?</h2>
+                    <p>Each month we get way more applications than we have spots. So if accepted, queue for the 50k plan may still be ~ weeks.</p>
+                </div>    
+                <div class="highlightQA">
+                    <h2>Can I join sooner?</h2>
+                    <p>Yes, we can approve you faster if you want a higher plan. Curious? <strong>Reply: “SOONER”.</strong></p>
+                </div> 
+                <div class="highlightQA">
+                    <h2>Other questions?</h2>
+                    <p>Just reply to this email and ask!</p>
+                </div>                
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-wrapper">
+            <p>If you did not apply for sending.ac, you can ignore this email, and the account will be deleted.</p>
+
+            <p>&copy; 2025 Sending.ac. All rights reserved. You received this email because you applied for an app that 
+            helps you create unlimited mailboxes. To update your email subscription preferences,
+            <a href="#">click here</a>.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

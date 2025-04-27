@@ -1,0 +1,392 @@
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sending.ac - Invite Email</title>
+
+    <!-- Stylesheets -->
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+            font-family: "Montserrat", sans-serif;
+        }
+    
+        :root {
+            --primary-color: #00173C;
+            --fade-text-color: #7F8684;
+            --white-color: #FFFFFF;
+            --border-color: rgba(0, 23, 60, 0.15);
+            --background-gradient: linear-gradient(180deg, #FCF3BA 0%, #FFFFFF 100%);
+            --secondary-background-gradient: linear-gradient(180deg, #FEEDA2 50%, #FFE78A 100%);
+            --yellow-color: #FFE78A;
+        }
+    
+        body {
+            background: var(--background-gradient) no-repeat;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        header {
+            padding: 40px 20px;
+            text-align: center;
+        }
+    
+        header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+    
+        header h1 span {
+            font-weight: 500;
+        }
+    
+        /* Main Wrapper */
+        main {
+            width: 100%;
+        }
+    
+        .main-wrapper {
+            max-width: 1320px;
+            width: 100%;
+            margin: 0px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 80px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+    
+        /* Celebrate Section */
+        #celebrate {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+    
+        #celebrate img {
+            width: 100px;
+        }
+    
+        #celebrate h2 {
+            font-size: 48px;
+            font-weight: 900;
+        }
+    
+        #celebrate p {
+            font-weight: 500;
+            font-size: 18px;
+            line-height: 24px;
+            text-align: center;
+            color: var(--fade-text-color);
+        }
+    
+        .steps-wrapper {
+            width: 560px;
+            border-radius: 30px;
+            border: 1px solid #00173C26;
+            padding: 60px 60px 30px 60px;
+            margin: 51px 0px 0px 0px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            row-gap: 40px;
+            background: var(--white-color);
+        }
+    
+        .steps {
+            display: flex;
+            flex-direction: column;
+            row-gap: 24px;
+        }
+    
+        .step {
+            font-weight: 700;
+            font-size: 24px;
+            line-height: 24px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            column-gap: 33px;
+        }
+    
+        .step .number {
+            width: 60px;
+            height: 60px;
+            border-radius: 99px;
+            background: var(--yellow-color);
+            font-family: Arial;
+            font-weight: 700;
+            font-size: 36px;
+            line-height: 24px;
+            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        .step-text-span {
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 6px;
+            letter-spacing: 0px;
+        }
+    
+        .thirdStep {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 10px;
+        }
+    
+        .btnNotes {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            text-align: left;
+        }
+    
+        main .cta-btn {
+            width: 440px;
+            height: 60px;
+            border-radius: 12px;
+            padding: 12px 48px;
+            background: var(--primary-color);
+            box-shadow: 0px 3px 9px 0px #00000017;
+            color: var(--white-color);
+            font-size: 24px;
+            line-height: 24px;
+            text-align: center;
+            font-weight: 700;
+        }
+    
+        .note {
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 17.07px;
+            letter-spacing: 0px;
+            color: var(--fade-text-color);
+        }
+
+        .video-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+            padding-top: 85px;
+        }
+
+        .video-wrapper h3 {
+            font-weight: 700;
+            font-size: 24px;
+            line-height: 24px;
+            text-align: center;
+            color: var(--fade-text-color);
+
+        }
+        /* Footer Section */
+        footer {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .footer-wrapper {
+            max-width: 1320px;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-wrapper p {
+            font-size: 14px;
+            color: var(--fade-text-color);
+            text-align: left;
+        }
+
+        .footer-wrapper a {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+        @media only screen and (max-width: 575px) {
+            .main-wrapper {
+                padding: 30px 15px;
+            }
+
+            #createAccount h2 {
+                font-size: 24px;
+                line-height: 1.4;
+            }
+
+            #createAccount h2 br {
+                display: none;
+            }
+
+            #createAccount button {
+                width: 240px;
+                height: 50px;
+                font-size: 18px;
+            }
+
+            .button-content p br {
+                display: none;
+            }
+            .footer-wrapper {
+                padding: 20px;
+            }
+
+            .firstNote br {
+                display: none;
+            }
+
+            .steps-wrapper {
+                width: 100%;
+                padding: 60px 30px 30px 30px;
+            }
+
+            .steps {
+                width: 100%;
+            }
+
+            .step {
+                flex-direction: column;
+                flex-wrap: nowrap;
+                gap: 20px;
+            }
+
+            .thirdStep {
+                align-items: center;
+            }
+
+            main .cta-btn {
+                width: 100%;
+            }
+
+            .video-wrapper br {
+                display: none;
+
+            }
+
+            #celebrate p br {
+                display: none;
+            }
+
+            #celebrate .Welcome-heading {
+                font-size: 30px;
+            }
+
+
+            .highlightQA h2 {
+                font-weight: 800;
+                font-size: 20px;
+                line-height: 100%;
+            }
+
+            .highlightQA p {
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 20px;
+
+            }
+            #celebrate .ChangedStyleName{
+                font-size: 30px;
+                line-height: 36px;
+            }
+            #createAccount .headingConfirmSection {
+                font-size: 20px;
+                line-height: 30px;
+                text-align: center;
+            }
+
+            #createAccount .headingConfirmSection span {
+                font-weight: 600;
+                font-size: 20px;
+                color: #00173C80;
+            }
+            #celebrate .paymentfailed{
+                font-size: 34px;
+            }
+
+        }
+    </style>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1>sending<span>.ac</span></h1>
+    </header>
+
+    <main>
+        <div class="main-wrapper">
+
+            <!-- Celebration Section -->
+            <section id="celebrate">
+                <figure>
+                    <img src="https://raw.githubusercontent.com/sending-ac/assets/9a65b952fa63d258fd453c152abf19932ae5b373/images/logo.png" alt="Logo">
+                </figure>
+                <h2 class="Welcome-heading">Welcome {{first_name}}</h2>
+                <p>You probably can ’t wait to use your mailboxes for <br>outreach. Here’s 3 steps to
+                    get
+                    there the fastest.</p>
+            </section>
+
+            <div class="steps-wrapper">
+
+                <div class="steps">
+                    <div class="step"><span class="number">1</span> Add domain</div>
+                    <div class="step"><span class="number">2</span> Create mailboxes</div>
+                    <div class="step"><span class="number">3</span>
+                        <div class="thirdStep">Import to sequencer <br><span
+                                class="step-text-span">(smartlead/instantly/etc)</span></div>
+                    </div>
+                </div>
+                <div class="btnNotes">
+                    <button class="cta-btn">Let’s do it.</button>
+                    <p class="note">
+                        NOTE: If you don’t create or use any mailboxes, we’ll cancel <br>your beta access and give your
+                        spot to the next person in line.
+                    </p>
+                </div>
+            </div>
+
+            <section class="video-wrapper">
+                <h3>We recommend watching the <br>walkthrough video to get started:</h3>
+                <div class="video-thumbnail">
+                    <img src="https://raw.githubusercontent.com/sending-ac/assets/9a65b952fa63d258fd453c152abf19932ae5b373/images/video-img.png" alt="video-img">
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-wrapper">
+            <p>If you did not apply for sending.ac, you can ignore this email, and the account will be deleted.</p>
+
+            <p>&copy; 2025 Sending.ac. All rights reserved. You received this email because you applied for an app that
+                helps you create unlimited mailboxes. To update your email subscription preferences,
+                <a href="#">click here</a>.
+            </p>
+        </div>
+    </footer>
+</body>
+
+</html>
