@@ -8,14 +8,39 @@ import {
     exportMaterials,
     listThinMaterials,
 } from './material.service';
+import { validateImage } from './material.validation';
+import { S3Service } from '@utils/third-party/s3/s3.service';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
+        // Validate receipt image if present
+        if (req.body.receipt) {
+            const validationResult = validateImage(req.body.receipt);
+            if (!validationResult.isValid) {
+                res.status(400).json({
+                    message: 'Validation failed',
+                    errors: validationResult.errors,
+                });
+                return;
+            }
+        }
+
         req.body.billDate = new Date();
         const material = await createMaterial(req.body);
+        
+        // Add signed URL for receipt if present
+        const materialData = material.toJSON();
+        if (materialData.receipt) {
+            const s3Service = new S3Service();
+            const signedUrl = await s3Service.getSignedUrl(
+                materialData.receipt,
+            );
+            materialData.receipt = signedUrl;
+        }
+
         res.status(201).json({
             message: 'Material created successfully',
-            data: material,
+            data: materialData,
         });
         return;
     } catch (error) {
@@ -53,7 +78,17 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        res.status(200).json({ data: material });
+        // Add signed URL for receipt if present
+        const materialData = material.toJSON();
+        if (materialData.receipt) {
+            const s3Service = new S3Service();
+            const signedUrl = await s3Service.getSignedUrl(
+                materialData.receipt,
+            );
+            materialData.receipt = signedUrl;
+        }
+
+        res.status(200).json({ data: materialData });
         return;
     } catch (error) {
         console.error('Get material error:', error);

@@ -8,6 +8,8 @@ import { Op } from 'sequelize';
 import ExcelJS from 'exceljs';
 import { Vendor } from '@database/models/vendor.model';
 import { Project } from '@database/models/project.model';
+import { config } from '@/utils/config';
+import { S3Service } from '@utils/third-party/s3/s3.service';
 
 interface ListMaterialsParams {
     page?: number;
@@ -35,6 +37,29 @@ export const createMaterial = async (
     input: MaterialCreationAttributes,
 ): Promise<Material> => {
     try {
+        if (input.receipt && input.receipt.startsWith('data:image')) {
+            const s3Service = new S3Service();
+            const base64Data = input.receipt.split(',')[1];
+            const buffer = Buffer.from(base64Data, 'base64');
+
+            // Detect content type and extension from base64 string
+            const contentType = input.receipt.split(';')[0].split(':')[1];
+            const extension = contentType.split('/')[1]; // Get extension from content type (e.g., jpeg, png, gif)
+
+            // Generate unique key for the image with extension
+            const timestamp = Date.now();
+            const randomString = Math.random().toString(36).substring(7);
+            const key = `${config.aws.organizationPrefix}/material-invoice/${timestamp}-${randomString}.${extension}`;
+
+            // Upload to S3
+            const fileKey = await s3Service.uploadFile(
+                buffer,
+                key,
+                contentType,
+            );
+            input.receipt = fileKey;
+        }
+
         return await Material.create(input);
     } catch (error) {
         console.error('Error creating material:', error);
@@ -71,23 +96,23 @@ export const listMaterials = async (
             'updatedAt',
             'vendorId',
             'materialTypeId',
-            'projectId'
+            'projectId',
         ],
         include: [
             {
                 model: MaterialType,
                 as: 'materialType',
-                attributes: ['id', 'name']
+                attributes: ['id', 'name'],
             },
             {
                 model: Vendor,
                 as: 'vendor',
-                attributes: ['id', 'vendorName']
+                attributes: ['id', 'vendorName'],
             },
             {
                 model: Project,
                 as: 'project',
-                attributes: ['id', 'projectName']
+                attributes: ['id', 'projectName'],
             },
         ],
         limit,
@@ -95,8 +120,26 @@ export const listMaterials = async (
         order: [['createdAt', 'DESC']],
     });
 
+    // Generate signed URLs for receipt images
+    const s3Service = new S3Service();
+    const materialsWithSignedUrls = await Promise.all(
+        rows.map(async material => {
+            const materialData = material.toJSON();
+            if (materialData.receipt) {
+                const signedUrl = await s3Service.getSignedUrl(
+                    materialData.receipt,
+                );
+                return {
+                    ...materialData,
+                    receipt: signedUrl,
+                };
+            }
+            return materialData;
+        }),
+    );
+
     return {
-        data: rows,
+        data: materialsWithSignedUrls as any,
         total: count,
         page,
         totalPages: Math.ceil(count / limit),

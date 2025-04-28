@@ -9,6 +9,7 @@ export interface MaterialAttributes {
     materialTypeId: string;
     projectId: string;
     receipt?: string;
+    receiptImage?: string;
     billDate?: Date;
     createdAt?: Date;
     updatedAt?: Date;
@@ -28,6 +29,7 @@ export class Material
     public materialTypeId!: string;
     public projectId!: string;
     public receipt?: string;
+    public receiptImage?: string;
     public billDate?: Date;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
