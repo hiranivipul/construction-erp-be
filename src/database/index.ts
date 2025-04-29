@@ -51,9 +51,9 @@ const Vendor = vendorModel(sequelize);
 
 // Set up associations after all models are initialized
 Object.values(sequelize.models).forEach(model => {
-    // if (model.associate) {
-    //     model.associate(sequelize.models);
-    // }
+    if (model.associate) {
+        model.associate(sequelize.models);
+    }
 });
 
 sequelize.authenticate();
