@@ -51,7 +51,11 @@ const Vendor = vendorModel(sequelize);
 
 // Set up associations after all models are initialized
 Object.values(sequelize.models).forEach(model => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     if (model.associate) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         model.associate(sequelize.models);
     }
 });
