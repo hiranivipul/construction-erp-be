@@ -7,6 +7,7 @@
         "start": "npm run build && node dist/server.js",
         "dev": "nodemon",
         "build": "tsc && tsc-alias && echo 'Build Finished! 👍'",
+        "pm2-start": "pm2 start npm --name erp_be -- run build",
         "lint": "eslint --ignore-path .gitignore --ext .ts src/",
         "lint:fix": "npm run lint -- --fix",
         "migration:generate": "sequelize migration:generate --name",
