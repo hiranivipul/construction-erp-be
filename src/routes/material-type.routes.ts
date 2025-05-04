@@ -37,6 +37,7 @@ router.get(
     list,
 );
 router.get('/export', getExport);
+router.get('/thin', getThinMaterialTypes);
 
 // Get a material type by ID
 router.get(
@@ -60,7 +61,5 @@ router.put(
 
 // Delete a material type
 router.delete('/:id', requireRole(UserRole.SUPER_ADMIN), remove);
-
-router.get('/thin', getThinMaterialTypes);
 
 export default router;

@@ -42,9 +42,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
             limit: limit ? parseInt(limit as string) : undefined,
             search: search as string,
         });
-        res.status(200).json(
-            result
-        );
+        res.status(200).json(result);
     } catch (error) {
         console.error('Error fetching material types:', error);
         res.status(500).json({
@@ -133,7 +131,9 @@ export const getThinMaterialTypes = async (
 ): Promise<void> => {
     try {
         const { search } = req.query;
-        const materialTypes = await listThinMaterialTypes(search as string | undefined);
+        const materialTypes = await listThinMaterialTypes(
+            search as string | undefined,
+        );
         res.status(200).json({
             success: true,
             data: materialTypes,
@@ -174,7 +174,10 @@ export const getExport = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const buffer = await exportMaterialTypes(parsedStartDate, parsedEndDate);
+        const buffer = await exportMaterialTypes(
+            parsedStartDate,
+            parsedEndDate,
+        );
 
         res.setHeader(
             'Content-Type',

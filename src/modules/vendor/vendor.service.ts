@@ -94,13 +94,11 @@ export const listThinVendors = async (
               }
             : {};
 
-        const vendors = await Vendor.findAll({
+        return await Vendor.findAll({
             where: whereClause,
-            attributes: ['id', 'vendor_name'],
+            attributes: ['id', 'vendorName'],
             order: [['vendor_name', 'ASC']],
         });
-
-        return vendors;
     } catch (error) {
         console.error('Error listing thin vendors:', error);
         throw error;

@@ -8,7 +8,6 @@ import { Op } from 'sequelize';
 import ExcelJS from 'exceljs';
 import { Vendor } from '@database/models/vendor.model';
 import { Project } from '@database/models/project.model';
-import { config } from '@/utils/config';
 import { S3Service } from '@utils/third-party/s3/s3.service';
 
 interface ListMaterialsParams {
@@ -33,6 +32,7 @@ interface ThinMaterial {
     projectId: string;
 }
 
+const organizationPrefix = 'ca8484';
 export const createMaterial = async (
     input: MaterialCreationAttributes,
 ): Promise<Material> => {
@@ -44,20 +44,19 @@ export const createMaterial = async (
 
             // Detect content type and extension from base64 string
             const contentType = input.receipt.split(';')[0].split(':')[1];
-            const extension = contentType.split('/')[1]; // Get extension from content type (e.g., jpeg, png, gif)
+            const extension = contentType.split('/')[1];
 
             // Generate unique key for the image with extension
             const timestamp = Date.now();
             const randomString = Math.random().toString(36).substring(7);
-            const key = `${config.aws.organizationPrefix}/material-invoice/${timestamp}-${randomString}.${extension}`;
+            const key = `${organizationPrefix}/material-invoice/${timestamp}-${randomString}.${extension}`;
 
             // Upload to S3
-            const fileKey = await s3Service.uploadFile(
+            input.receipt = await s3Service.uploadFile(
                 buffer,
                 key,
                 contentType,
             );
-            input.receipt = fileKey;
         }
 
         return await Material.create(input);
@@ -97,6 +96,8 @@ export const listMaterials = async (
             'vendorId',
             'materialTypeId',
             'projectId',
+            'unit',
+            'quantity',
         ],
         include: [
             {
@@ -173,7 +174,24 @@ export const updateMaterial = async (
     if (!material) {
         return null;
     }
+    if (input.receipt && input.receipt.startsWith('data:image')) {
+        const s3Service = new S3Service();
+        const base64Data = input.receipt.split(',')[1];
+        const buffer = Buffer.from(base64Data, 'base64');
 
+        // Detect content type and extension from base64 string
+        const contentType = input.receipt.split(';')[0].split(':')[1];
+        const extension = contentType.split('/')[1];
+
+        // Generate unique key for the image with extension
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(7);
+        const key = `${organizationPrefix}/material-invoice/${timestamp}-${randomString}.${extension}`;
+        const materialCurrent = await getMaterialById(id);
+        await s3Service.deleteFile(materialCurrent?.receipt);
+        // Upload to S3
+        input.receipt = await s3Service.uploadFile(buffer, key, contentType);
+    }
     return material.update(input);
 };
 
@@ -198,13 +216,11 @@ export const listThinMaterials = async (
               }
             : {};
 
-        const materials = await Material.findAll({
+        return await Material.findAll({
             where: whereClause,
             attributes: ['id', 'vendorId', 'materialTypeId', 'projectId'],
             order: [['createdAt', 'ASC']],
         });
-
-        return materials;
     } catch (error) {
         console.error('Error listing thin materials:', error);
         throw error;
@@ -263,9 +279,11 @@ export const exportMaterials = async (
         { header: 'No', key: 'no', width: 5 },
         { header: 'Material Type', key: 'materialType', width: 20 },
         { header: 'Material Type', key: 'materialSlug', width: 20 },
+        { header: 'Unit', key: 'unit', width: 5 },
+        { header: 'Quantity', key: 'quantity', width: 10 },
         { header: 'Vendor', key: 'vendor', width: 20 },
         { header: 'Project', key: 'project', width: 20 },
-        { header: 'Bill Date', key: 'billDate', width: 15 },
+        { header: 'Receipt Date', key: 'billDate', width: 15 },
     ];
 
     // Add each material as a row
@@ -275,6 +293,8 @@ export const exportMaterials = async (
             no: materialNo,
             vendor: material.vendor?.vendorName,
             materialType: material.materialType?.name,
+            unit: material.unit,
+            quantity: material.quantity,
             materialSlug: material.materialType?.slug,
             project: material.project?.projectName,
             billDate: material.billDate,

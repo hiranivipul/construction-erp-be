@@ -35,13 +35,30 @@ export const createMaterialSchema = Joi.object({
             'string.max': validationMessages.maxLength('Receipt', 255),
         }),
 
+    unit: Joi.string()
+        .valid('KG', 'TONS', 'NOS')
+        .required()
+        .messages({
+            'string.empty': validationMessages.required('Unit'),
+            'any.only': 'Unit must be one of: KG, TONS, NOS',
+        }),
+
+    quantity: Joi.number()
+        .min(0.1)
+        .required()
+        .messages({
+            'number.base': 'Quantity must be a number',
+            'number.min': 'Quantity must be greater than or equal to 0',
+            'any.required': validationMessages.required('Quantity'),
+        }),
+
     // billDate: Joi.date().allow(null).optional().messages({
     //     'date.base': 'Invalid bill date format',
     // }),
 });
 
 export const updateMaterialSchema = createMaterialSchema.fork(
-    ['vendorId', 'materialTypeId', 'projectId', 'receipt'],
+    ['vendorId', 'materialTypeId', 'projectId', 'receipt', 'unit', 'quantity'],
     schema => schema.optional(),
 );
 

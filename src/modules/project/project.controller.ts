@@ -167,7 +167,7 @@ export const getThinProjects = async (
     try {
         const { search } = req.query;
         const projects = await listThinProjects(search as string | undefined);
-        res.status(200).json({ data:projects });
+        res.status(200).json({ data: projects });
     } catch (error) {
         console.error('Error in getThinProjects controller:', error);
         res.status(500).json({ message: 'Internal server error' });

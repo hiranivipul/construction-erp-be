@@ -23,7 +23,6 @@ export const config = {
             bucketName:
                 process.env.AWS_S3_BUCKET_NAME || 'construction-erp-data',
         },
-        organizationPrefix: process.env.ORGANIZATION_PREFIX || 'org-1',
     },
 };
 

@@ -3,6 +3,8 @@ import { MaterialType } from './material-type.model';
 import { Vendor } from './vendor.model';
 import { Project } from './project.model';
 
+export type MaterialUnit = 'KG' | 'TONS' | 'NOS';
+
 export interface MaterialAttributes {
     id: string;
     vendorId: string;
@@ -11,6 +13,8 @@ export interface MaterialAttributes {
     receipt?: string;
     receiptImage?: string;
     billDate?: Date;
+    unit: MaterialUnit;
+    quantity: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -30,7 +34,9 @@ export class Material
     public projectId!: string;
     public receipt?: string;
     public receiptImage?: string;
-    public billDate?: Date;
+    public readonly billDate?: Date;
+    public unit!: MaterialUnit;
+    public quantity!: number;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 
@@ -104,6 +110,18 @@ export default function (sequelize: Sequelize): typeof Material {
                 type: DataTypes.DATE,
                 allowNull: true,
                 field: 'bill_date',
+            },
+            unit: {
+                type: DataTypes.ENUM('KG', 'TONS', 'NOS'),
+                allowNull: false,
+                defaultValue: 'NOS',
+                field: 'unit',
+            },
+            quantity: {
+                type: DataTypes.FLOAT,
+                allowNull: false,
+                defaultValue: 0,
+                field: 'quantity',
             },
             createdAt: {
                 type: DataTypes.DATE,

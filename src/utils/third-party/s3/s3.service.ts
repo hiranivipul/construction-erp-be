@@ -1,4 +1,9 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+    S3Client,
+    PutObjectCommand,
+    GetObjectCommand,
+    DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { config } from '../../config';
 
@@ -18,7 +23,11 @@ export class S3Service {
         this.bucketName = config.aws.s3.bucketName;
     }
 
-    async uploadFile(file: Buffer, key: string, contentType: string): Promise<string> {
+    async uploadFile(
+        file: Buffer,
+        key: string,
+        contentType: string,
+    ): Promise<string> {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
             Key: key,
@@ -30,7 +39,7 @@ export class S3Service {
         return key;
     }
 
-    async getSignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
+    async getSignedUrl(key: string, expiresIn = 3600): Promise<string> {
         const command = new GetObjectCommand({
             Bucket: this.bucketName,
             Key: key,
@@ -38,4 +47,19 @@ export class S3Service {
 
         return getSignedUrl(this.s3Client, command, { expiresIn });
     }
-} 
+
+    async deleteFile(key: string): Promise<void> {
+        try {
+            console.log('Attempting to delete file with key:', key);
+            const command = new DeleteObjectCommand({
+                Bucket: this.bucketName,
+                Key: key,
+            });
+            await this.s3Client.send(command);
+            console.log('Successfully deleted file:', key);
+        } catch (error) {
+            console.error('Error deleting file from S3:', error);
+            throw error;
+        }
+    }
+}
