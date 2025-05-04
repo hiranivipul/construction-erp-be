@@ -6,27 +6,11 @@ import {
 } from '@database/models/project.model';
 import { Op } from 'sequelize';
 import ExcelJS from 'exceljs';
-
-interface ListProjectsParams {
-    page?: number;
-    limit?: number;
-    search?: string;
-    status?: string;
-    startDate?: Date;
-    endDate?: Date;
-}
-
-interface ListProjectsResult {
-    data: Project[];
-    total: number;
-    page: number;
-    totalPages: number;
-}
-
-interface ThinProject {
-    id: string;
-    projectName: string;
-}
+import {
+    ListProjectsParams,
+    ListProjectsResult,
+    ThinProject,
+} from './project.dto';
 
 export const createProject = async (
     input: ProjectCreationAttributes,

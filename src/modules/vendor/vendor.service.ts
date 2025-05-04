@@ -5,24 +5,7 @@ import {
 } from '@database/models/vendor.model';
 import { Op } from 'sequelize';
 import ExcelJS from 'exceljs';
-
-interface ListVendorsParams {
-    page?: number;
-    limit?: number;
-    search?: string;
-}
-
-interface ListVendorsResult {
-    data: Vendor[];
-    total: number;
-    page: number;
-    totalPages: number;
-}
-
-interface ThinVendor {
-    id: string;
-    vendorName: string;
-}
+import { ListVendorsParams, ListVendorsResult, ThinVendor } from './vendor.dto';
 
 export const createVendor = async (
     input: VendorCreationAttributes,

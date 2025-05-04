@@ -1,57 +1,56 @@
 import { Request, Response } from 'express';
-import { User } from '@database/models/user.model';
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { config } from '@utils/config';
 import { createUser } from './auth.service';
-
-const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-};
-
-const validatePassword = (password: string): boolean => {
-    return password.length >= 6;
-};
+import { registerSchema, loginSchema } from './auth.validation';
+import { RegisterDto, LoginDto, AuthResponseDto } from './auth.dto';
+import { User } from '@database/models/user.model';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { name, email, password } = req.body;
+        const { error, value } = registerSchema.validate(req.body, {
+            abortEarly: false,
+        });
 
-        // Validate input
-        if (!name || !email || !password) {
-            res.status(400).json({ message: 'All fields are required' });
-            return;
-        }
-        if (!validateEmail(email)) {
-            res.status(400).json({ message: 'Invalid email format' });
-            return;
-        }
-        if (!validatePassword(password)) {
+        if (error) {
             res.status(400).json({
-                message: 'Password must be at least 6 characters long',
+                message: 'Validation failed',
+                errors: error.details.map(detail => ({
+                    field: detail.path[0],
+                    message: detail.message,
+                })),
             });
             return;
         }
 
+        const { name, email, password, organizationId } = value as RegisterDto;
+
         // Check if user already exists
-        const existingUser = await User.findOne({ where: { email } });
+        const existingUser = await User.findOne({
+            where: { email },
+        });
         if (existingUser) {
             res.status(400).json({ message: 'User already exists' });
             return;
         }
 
-        // Create new user
-        const user = await createUser({ name, email, password });
+        // Create new user with schema instance from request
+        const user = await createUser(value as RegisterDto, req);
 
         // Generate JWT token
         const token = sign(
-            { id: user.id, email: user.email, role: user.role },
+            {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                organizationId,
+            },
             config.jwt.secret,
             { expiresIn: '24h' },
         );
 
-        res.status(201).json({
+        const response: AuthResponseDto = {
             message: 'User registered successfully',
             user: {
                 id: user.id,
@@ -60,7 +59,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
                 role: user.role,
             },
             token,
-        });
+        };
+
+        res.status(201).json(response);
         return;
     } catch (error) {
         console.error('Registration error:', error);
@@ -71,22 +72,27 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { email, password } = req.body;
+        const { error, value } = loginSchema.validate(req.body, {
+            abortEarly: false,
+        });
 
-        // Validate input
-        if (!email || !password) {
+        if (error) {
             res.status(400).json({
-                message: 'Email and password are required',
+                message: 'Validation failed',
+                errors: error.details.map(detail => ({
+                    field: detail.path[0],
+                    message: detail.message,
+                })),
             });
             return;
         }
-        if (!validateEmail(email)) {
-            res.status(400).json({ message: 'Invalid email format' });
-            return;
-        }
 
-        // Find user by email
-        const user = await User.findOne({ where: { email } });
+        const { email, password, organizationId } = value as LoginDto;
+
+        // Check if user exists using schema instance from request
+        const user = await User.findOne({
+            where: { email },
+        });
         if (!user) {
             res.status(401).json({ message: 'Invalid credentials' });
             return;
@@ -101,12 +107,17 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
         // Generate JWT token
         const token = sign(
-            { id: user.id, email: user.email, role: user.role },
+            {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                organizationId,
+            },
             config.jwt.secret,
             { expiresIn: '24h' },
         );
 
-        res.status(200).json({
+        const response: AuthResponseDto = {
             message: 'Login successful',
             user: {
                 id: user.id,
@@ -115,7 +126,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
                 role: user.role,
             },
             token,
-        });
+        };
+
+        res.status(200).json(response);
         return;
     } catch (error) {
         console.error('Login error:', error);

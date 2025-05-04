@@ -2,30 +2,17 @@ import { MaterialType } from '@database/models/material-type.model';
 import { Op } from 'sequelize';
 import ExcelJS from 'exceljs';
 import { AppError } from '@utils/app-error';
+import {
+    ListMaterialTypesParams,
+    ListMaterialTypesResult,
+    ThinMaterialType,
+    CreateMaterialTypeInput,
+    UpdateMaterialTypeInput,
+} from './material-type.dto';
 
-interface ListMaterialTypesParams {
-    page?: number;
-    limit?: number;
-    search?: string;
-}
-
-interface ListMaterialTypesResult {
-    data: MaterialType[];
-    total: number;
-    page: number;
-    totalPages: number;
-}
-
-interface ThinMaterialType {
-    id: string;
-    name: string;
-    slug: string;
-}
-
-export const createMaterialType = async (input: {
-    name: string;
-    description?: string;
-}): Promise<MaterialType> => {
+export const createMaterialType = async (
+    input: CreateMaterialTypeInput,
+): Promise<MaterialType> => {
     // Check if material type with same name already exists
     const existingMaterialType = await MaterialType.findOne({
         where: { name: input.name },
@@ -80,7 +67,7 @@ export const getMaterialTypeById = async (
 
 export const updateMaterialType = async (
     id: string,
-    input: { name?: string; description?: string },
+    input: UpdateMaterialTypeInput,
 ): Promise<MaterialType> => {
     const materialType = await MaterialType.findByPk(id);
     if (!materialType) {

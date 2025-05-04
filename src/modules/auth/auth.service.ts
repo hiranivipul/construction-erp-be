@@ -1,16 +1,14 @@
-import { User } from '../../database/models/user.model';
+import { DB } from '@database/index';
+import { UserRoleEnum } from '@database/models/user.model';
 import { hash } from 'bcrypt';
-import { UserRoleEnum } from '../../database/models/user.model';
+import { RegisterDto } from './auth.dto';
+import { Request } from 'express';
 
-interface CreateUserInput {
-    name: string;
-    email: string;
-    password: string;
-}
-
-export const createUser = async (input: CreateUserInput): Promise<User> => {
+export const createUser = async (input: RegisterDto, req: Request) => {
     const { name, email, password } = input;
     const hashedPassword = await hash(password, 10);
+
+    // Use schema instance from request
     return User.create({
         name,
         email,

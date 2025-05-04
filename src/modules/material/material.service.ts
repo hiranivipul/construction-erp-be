@@ -9,36 +9,18 @@ import ExcelJS from 'exceljs';
 import { Vendor } from '@database/models/vendor.model';
 import { Project } from '@database/models/project.model';
 import { S3Service } from '@utils/third-party/s3/s3.service';
+import { ListMaterialsParams, ListMaterialsResult, ThinMaterial } from './material.dto';
 
-interface ListMaterialsParams {
-    page?: number;
-    limit?: number;
-    search?: string;
-    startDate?: Date;
-    endDate?: Date;
-}
-
-interface ListMaterialsResult {
-    data: Material[];
-    total: number;
-    page: number;
-    totalPages: number;
-}
-
-interface ThinMaterial {
-    id: string;
-    vendorId: string;
-    materialTypeId: string;
-    projectId: string;
-}
+// Create a global S3Service instance
+const s3Service = new S3Service();
 
 const organizationPrefix = 'ca8484';
+
 export const createMaterial = async (
     input: MaterialCreationAttributes,
 ): Promise<Material> => {
     try {
         if (input.receipt && input.receipt.startsWith('data:image')) {
-            const s3Service = new S3Service();
             const base64Data = input.receipt.split(',')[1];
             const buffer = Buffer.from(base64Data, 'base64');
 
@@ -122,7 +104,6 @@ export const listMaterials = async (
     });
 
     // Generate signed URLs for receipt images
-    const s3Service = new S3Service();
     const materialsWithSignedUrls = await Promise.all(
         rows.map(async material => {
             const materialData = material.toJSON();
@@ -175,7 +156,6 @@ export const updateMaterial = async (
         return null;
     }
     if (input.receipt && input.receipt.startsWith('data:image')) {
-        const s3Service = new S3Service();
         const base64Data = input.receipt.split(',')[1];
         const buffer = Buffer.from(base64Data, 'base64');
 

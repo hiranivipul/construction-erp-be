@@ -15,7 +15,7 @@ import {
     NODE_ENV,
 } from '@/config';
 
-const sequelize = new Sequelize.Sequelize(
+export const sequelize = new Sequelize.Sequelize(
     DB_NAME as string,
     DB_USERNAME as string,
     DB_PASSWORD,
