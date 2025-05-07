@@ -52,12 +52,12 @@ export const loginSchema = Joi.object({
             'any.required': validationMessages.required('Password'),
         }),
 
-    organizationId: Joi.string()
-        .required()
-        .messages({
-            'string.empty': validationMessages.required('Organization ID'),
-            'any.required': validationMessages.required('Organization ID'),
-        }),
+    // organizationId: Joi.string()
+    //     .required()
+    //     .messages({
+    //         'string.empty': validationMessages.required('Organization ID'),
+    //         'any.required': validationMessages.required('Organization ID'),
+    //     }),
 });
 
 export const validateLoginInput = (req: any, res: any, next: any) => {
@@ -70,4 +70,4 @@ export const validateLoginInput = (req: any, res: any, next: any) => {
         });
     }
     next();
-}; 
+};
