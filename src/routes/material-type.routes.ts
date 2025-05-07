@@ -13,7 +13,7 @@ import {
     createMaterialTypeSchema,
     updateMaterialTypeSchema,
 } from '@/modules/material-type/material-type.validation';
-import { requireRole, UserRole } from '@/middleware/role.middleware';
+import { requireRole, UserRole } from '@/middlewares/role.middleware';
 
 const router = Router();
 

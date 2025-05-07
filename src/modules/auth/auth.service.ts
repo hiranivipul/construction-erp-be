@@ -1,5 +1,4 @@
-import { DB } from '@database/index';
-import { UserRoleEnum } from '@database/models/user.model';
+import { User, UserRoleEnum } from '@database/models/user.model';
 import { hash } from 'bcrypt';
 import { RegisterDto } from './auth.dto';
 import { Request } from 'express';

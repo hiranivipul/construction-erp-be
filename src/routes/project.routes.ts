@@ -13,7 +13,7 @@ import {
     getExport,
     getThinProjects,
 } from '@/modules/project/project.controller';
-import { requireRole, UserRole } from '@/middleware/role.middleware';
+import { requireRole, UserRole } from '@/middlewares/role.middleware';
 
 const ProjectRouter = Router();
 
@@ -63,6 +63,5 @@ ProjectRouter.put(
 );
 
 ProjectRouter.delete('/:id', requireRole(UserRole.SUPER_ADMIN), remove);
-
 
 export default ProjectRouter;

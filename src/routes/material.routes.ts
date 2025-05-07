@@ -13,7 +13,7 @@ import {
     createMaterialSchema,
     updateMaterialSchema,
 } from '@/modules/material/material.validation';
-import { requireRole, UserRole } from '@/middleware/role.middleware';
+import { requireRole, UserRole } from '@/middlewares/role.middleware';
 
 const MaterialRouter = Router();
 
@@ -39,6 +39,8 @@ MaterialRouter.get(
     ),
     list,
 );
+MaterialRouter.get('/thin', getThinMaterialTypes);
+
 MaterialRouter.get('/export', getExport);
 
 MaterialRouter.get(
@@ -68,8 +70,6 @@ MaterialRouter.delete(
     requireRole(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT),
     remove,
 );
-
-MaterialRouter.get('/thin', getThinMaterialTypes);
 
 
 export default MaterialRouter;

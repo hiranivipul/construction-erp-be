@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticateToken } from '@/middleware/auth.middleware';
+import { authenticateToken } from '@/middlewares/auth.middleware';
 import AuthRouter from './auth.routes';
 import ProjectRouter from './project.routes';
 import MaterialRouter from './material.routes';

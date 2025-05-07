@@ -14,8 +14,10 @@ export enum UserRole {
 }
 
 export const requireRole = (...roles: UserRole[]): RequestHandler => {
-    return (req: AuthRequest, res: Response, next: NextFunction) => {
-        const userRole = req.user?.role;
+    return (req: Request, res: Response, next: NextFunction): void => {
+        // Cast the request to AuthRequest to access user property
+        const authReq = req as AuthRequest;
+        const userRole = authReq.user?.role;
 
         if (!userRole) {
             res.status(403).json({

@@ -13,7 +13,7 @@ import {
     createVendorSchema,
     updateVendorSchema,
 } from '@/modules/vendor/vendor.validation';
-import { requireRole, UserRole } from '@/middleware/role.middleware';
+import { requireRole, UserRole } from '@/middlewares/role.middleware';
 
 const VendorRouter = Router();
 
