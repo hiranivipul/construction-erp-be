@@ -5,6 +5,7 @@ import materialModel from './models/material.model';
 import materialTypeModel from './models/material-type.model';
 import projectModel from './models/project.model';
 import vendorModel from './models/vendor.model';
+import expenseModel from './models/expense';
 import {
     DB_DIALECT,
     DB_HOST,
@@ -48,6 +49,7 @@ const Material = materialModel(sequelize);
 const MaterialType = materialTypeModel(sequelize);
 const Projects = projectModel(sequelize);
 const Vendor = vendorModel(sequelize);
+const Expense = expenseModel(sequelize);
 
 // Set up associations after all models are initialized
 Object.values(sequelize.models).forEach(model => {
@@ -68,6 +70,7 @@ export const DB = {
     MaterialType,
     Projects,
     Vendor,
+    Expense,
     sequelize, // connection instance (RAW queries)
     Sequelize, // library
 };
