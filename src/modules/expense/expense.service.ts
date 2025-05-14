@@ -69,7 +69,14 @@ export const listExpenses = async ({
         if (search) {
             where[Op.or] = [
                 { description: { [Op.iLike]: `%${search}%` } },
-                { expense_scope: { [Op.iLike]: `%${search}%` } },
+                {
+                    expense_scope:
+                        search.toLowerCase() === 'project'
+                            ? 'project'
+                            : search.toLowerCase() === 'company'
+                            ? 'company'
+                            : null,
+                },
             ];
         }
 
