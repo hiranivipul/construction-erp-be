@@ -12,6 +12,7 @@
         "lint:fix": "npm run lint -- --fix",
         "migration:generate": "sequelize migration:generate --name",
         "migration": "sequelize db:migrate",
+        "migration:undo": "sequelize db:migrate:undo",
         "seed": "sequelize db:seed:all"
     },
     "author": "",
