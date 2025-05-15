@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { Project } from './project.model';
 import { User } from './user.model';
+import { Vendor } from './vendor.model';
 
 export type ExpenseScope = 'project' | 'company';
 
@@ -9,6 +10,7 @@ export interface ExpenseAttributes {
     date: Date;
     expense_scope: ExpenseScope;
     project_id: string | null;
+    vendor_id: string | null;
     description: string | null;
     amount: number;
     created_by: string;
@@ -29,6 +31,7 @@ export class Expense extends Model<
     public date!: Date;
     public expense_scope!: ExpenseScope;
     public project_id!: string | null;
+    public vendor_id!: string | null;
     public description!: string | null;
     public amount!: number;
     public created_by!: string;
@@ -38,6 +41,7 @@ export class Expense extends Model<
     // Associations
     public project?: Project;
     public creator?: User;
+    public vendor?: Vendor;
 
     public static associate(models: any) {
         Expense.belongsTo(models.Project, {
@@ -49,6 +53,11 @@ export class Expense extends Model<
             foreignKey: 'created_by',
             as: 'creator',
             targetKey: 'id',
+        });
+
+        Expense.belongsTo(models.Vendor, {
+            foreignKey: 'vendor_id',
+            as: 'vendor',
         });
     }
 }
@@ -76,6 +85,15 @@ export default function (sequelize: Sequelize): typeof Expense {
                 field: 'project_id',
                 references: {
                     model: 'projects',
+                    key: 'id',
+                },
+            },
+            vendor_id: {
+                type: DataTypes.UUID,
+                allowNull: true,
+                field: 'vendor_id',
+                references: {
+                    model: 'vendors',
                     key: 'id',
                 },
             },

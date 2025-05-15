@@ -3,6 +3,7 @@ import ExcelJS from 'exceljs';
 import { Expense } from '@database/models/expense';
 import { Project } from '@database/models/project.model';
 import { User } from '@database/models/user.model';
+import { Vendor } from '@database/models/vendor.model';
 import { CreateExpenseDto, UpdateExpenseDto } from './expense.dto';
 
 export interface ListExpensesParams {
@@ -14,7 +15,7 @@ export interface ListExpensesParams {
 }
 
 export interface ListExpensesResult {
-    data: any[];
+    data: Expense[];
     total: number;
     page: number;
     totalPages: number;
@@ -47,6 +48,11 @@ export const createExpense = async (
                     as: 'creator',
                     attributes: ['id', 'name'],
                 },
+                {
+                    model: Vendor,
+                    as: 'vendor',
+                    attributes: ['id', 'vendor_name'],
+                },
             ],
         });
     } catch (error) {
@@ -77,6 +83,8 @@ export const listExpenses = async ({
                             ? 'company'
                             : null,
                 },
+                { '$vendor.vendor_name$': { [Op.iLike]: `%${search}%` } },
+                { '$project.project_name$': { [Op.iLike]: `%${search}%` } },
             ];
         }
 
@@ -98,6 +106,11 @@ export const listExpenses = async ({
                     model: User,
                     as: 'creator',
                     attributes: ['id', 'name'],
+                },
+                {
+                    model: Vendor,
+                    as: 'vendor',
+                    attributes: ['id', 'vendor_name'],
                 },
             ],
             order: [['created_at', 'DESC']],
@@ -129,6 +142,11 @@ export const getExpenseById = async (id: string): Promise<Expense | null> => {
                 model: User,
                 as: 'creator',
                 attributes: ['id', 'name'],
+            },
+            {
+                model: Vendor,
+                as: 'vendor',
+                attributes: ['id', 'vendor_name'],
             },
         ],
     });
@@ -177,6 +195,11 @@ export const exportExpenses = async (
                     as: 'creator',
                     attributes: ['name'],
                 },
+                {
+                    model: Vendor,
+                    as: 'vendor',
+                    attributes: ['vendor_name'],
+                },
             ],
             order: [['created_at', 'DESC']],
         });
@@ -189,6 +212,7 @@ export const exportExpenses = async (
             { header: 'Date', key: 'date', width: 15 },
             { header: 'Expense Scope', key: 'expense_scope', width: 15 },
             { header: 'Project', key: 'project', width: 20 },
+            { header: 'Vendor', key: 'vendor', width: 20 },
             { header: 'Description', key: 'description', width: 30 },
             { header: 'Amount', key: 'amount', width: 15 },
             { header: 'Created By', key: 'created_by', width: 20 },
@@ -200,6 +224,7 @@ export const exportExpenses = async (
                 date: expenseData.date,
                 expense_scope: expenseData.expense_scope,
                 project: expenseData.project?.projectName || 'N/A',
+                vendor: expenseData.vendor?.vendorName || 'N/A',
                 description: expenseData.description || 'N/A',
                 amount: expenseData.amount,
                 created_by: expenseData.creator?.name || 'N/A',
@@ -209,17 +234,6 @@ export const exportExpenses = async (
         // Style the header row
         const headerRow = worksheet.getRow(1);
         headerRow.font = { bold: true };
-        headerRow.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FFE0E0E0' },
-        };
-
-        // Format amount column as currency
-        worksheet.getColumn('amount').numFmt = '"₹"#,##0.00';
-
-        // Format date column
-        worksheet.getColumn('date').numFmt = 'dd/mm/yyyy';
 
         return await workbook.xlsx.writeBuffer();
     } catch (error) {

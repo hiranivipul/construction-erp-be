@@ -19,7 +19,7 @@ export const createExpenseSchema = Joi.object({
         .when('expense_scope', {
             is: 'project',
             then: Joi.required(),
-            otherwise: Joi.forbidden(),
+            otherwise: Joi.allow(null),
         })
         .messages({
             'string.empty': validationMessages.required('Project ID'),
@@ -27,8 +27,15 @@ export const createExpenseSchema = Joi.object({
             'string.uuid': 'Project ID must be a valid UUID v4',
             'any.required':
                 'Project ID is required when expense scope is project',
-            'any.unknown':
-                'Project ID should not be provided for company expenses',
+        }),
+
+    vendor_id: Joi.string()
+        .uuid({ version: 'uuidv4' })
+        .optional()
+        .messages({
+            'string.empty': validationMessages.required('Vendor ID'),
+            'string.guid': 'Invalid vendor ID format',
+            'string.uuid': 'Vendor ID must be a valid UUID v4',
         }),
 
     description: Joi.string().optional().allow(null, '').messages({
@@ -48,7 +55,14 @@ export const createExpenseSchema = Joi.object({
 });
 
 export const updateExpenseSchema = createExpenseSchema.fork(
-    ['expense_scope', 'project_id', 'description', 'amount', 'date'],
+    [
+        'expense_scope',
+        'project_id',
+        'vendor_id',
+        'description',
+        'amount',
+        'date',
+    ],
     schema => schema.optional(),
 );
 
