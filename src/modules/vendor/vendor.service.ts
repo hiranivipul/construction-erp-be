@@ -23,7 +23,7 @@ export const listVendors = async (
     const where: any = {};
 
     if (params.search) {
-        where[Op.or] = [{ vendorName: { [Op.iLike]: `%${params.search}%` } }];
+        where[Op.or] = [{ vendor_name: { [Op.iLike]: `%${params.search}%` } }];
     }
 
     const { count, rows } = await Vendor.findAndCountAll({
@@ -71,7 +71,7 @@ export const listThinVendors = async (
     try {
         const whereClause = search
             ? {
-                  vendorName: {
+                  vendor_name: {
                       [Op.iLike]: `%${search}%`,
                   },
               }
@@ -79,7 +79,7 @@ export const listThinVendors = async (
 
         return await Vendor.findAll({
             where: whereClause,
-            attributes: ['id', 'vendorName'],
+            attributes: ['id', 'vendor_name'],
             order: [['vendor_name', 'ASC']],
         });
     } catch (error) {
@@ -131,8 +131,8 @@ export const exportVendors = async (
     vendors.forEach(vendor => {
         worksheet.addRow({
             no: vendorNo,
-            name: vendor.vendorName,
-            address: vendor.vendorAddress,
+            name: vendor.vendor_name,
+            address: vendor.vendor_address,
             createdAt: vendor.createdAt,
         });
         vendorNo++;

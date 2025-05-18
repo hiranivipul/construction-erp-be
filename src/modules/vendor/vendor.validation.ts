@@ -2,7 +2,7 @@ import Joi from 'joi';
 import { validationMessages } from '@utils/validation';
 
 export const createVendorSchema = Joi.object({
-    vendorName: Joi.string()
+    vendor_name: Joi.string()
         .required()
         .min(2)
         .max(100)
@@ -12,9 +12,7 @@ export const createVendorSchema = Joi.object({
             'string.max': validationMessages.maxLength('Name', 100),
         }),
 
-
-
-    vendorAddress: Joi.string()
+    vendor_address: Joi.string()
         .required()
         .min(5)
         .max(200)
@@ -23,13 +21,9 @@ export const createVendorSchema = Joi.object({
             'string.min': validationMessages.minLength('Address', 5),
             'string.max': validationMessages.maxLength('Address', 200),
         }),
-
 });
 
 export const updateVendorSchema = createVendorSchema.fork(
-    [
-        'vendorName',
-        'vendorAddress',
-    ],
+    ['vendor_name', 'vendor_address'],
     schema => schema.optional(),
 );

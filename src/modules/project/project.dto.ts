@@ -18,5 +18,5 @@ export interface ListProjectsResult {
 
 export interface ThinProject {
     id: string;
-    projectName: string;
-} 
+    project_name: string;
+}

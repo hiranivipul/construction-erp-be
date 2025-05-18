@@ -30,6 +30,7 @@ export const createExpenseSchema = Joi.object({
         }),
 
     vendor_id: Joi.string()
+        .allow(null)
         .uuid({ version: 'uuidv4' })
         .optional()
         .messages({

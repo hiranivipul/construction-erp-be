@@ -15,5 +15,5 @@ export interface ListVendorsResult {
 
 export interface ThinVendor {
     id: string;
-    vendorName: string;
-} 
+    vendor_name: string;
+}

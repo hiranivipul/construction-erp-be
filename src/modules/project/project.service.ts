@@ -17,7 +17,7 @@ export const createProject = async (
 ): Promise<Project> => {
     // Ensure all required fields are present and properly formatted
     const projectData: ProjectCreationAttributes = {
-        projectName: input.projectName,
+        project_name: input.project_name,
         client: input.client,
         constructionSite: input.constructionSite,
         startDate: new Date(input.startDate),
@@ -49,7 +49,7 @@ export const listProjects = async (
 
     if (params.search) {
         where[Op.or] = [
-            { projectName: { [Op.iLike]: `%${params.search}%` } },
+            { project_name: { [Op.iLike]: `%${params.search}%` } },
             { client: { [Op.iLike]: `%${params.search}%` } },
             { constructionSite: { [Op.iLike]: `%${params.search}%` } },
         ];
@@ -130,7 +130,7 @@ export const exportProject = async (
     projects.forEach(project => {
         worksheet.addRow({
             id: projectNo,
-            name: project.projectName,
+            name: project.project_name,
             client: project.client,
             constructionSite: project.constructionSite,
             startDate: project.startDate,
@@ -155,7 +155,7 @@ export const updateProject = async (
     const updateData: Partial<ProjectAttributes> = {};
 
     // Only update fields that are provided
-    if (input.projectName) updateData.projectName = input.projectName;
+    if (input.project_name) updateData.project_name = input.project_name;
     if (input.client) updateData.client = input.client;
     if (input.constructionSite)
         updateData.constructionSite = input.constructionSite;
@@ -182,19 +182,17 @@ export const listThinProjects = async (
     try {
         const whereClause = search
             ? {
-                  projectName: {
+                  project_name: {
                       [Op.iLike]: `%${search}%`,
                   },
               }
             : {};
 
-        const projects = await Project.findAll({
+        return await Project.findAll({
             where: whereClause,
-            attributes: ['id', 'projectName'],
-            order: [['projectName', 'ASC']],
+            attributes: ['id', 'project_name'],
+            order: [['project_name', 'ASC']],
         });
-
-        return projects;
     } catch (error) {
         console.error('Error listing thin projects:', error);
         throw error;

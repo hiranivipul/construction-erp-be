@@ -9,7 +9,11 @@ import ExcelJS from 'exceljs';
 import { Vendor } from '@database/models/vendor.model';
 import { Project } from '@database/models/project.model';
 import { S3Service } from '@utils/third-party/s3/s3.service';
-import { ListMaterialsParams, ListMaterialsResult, ThinMaterial } from './material.dto';
+import {
+    ListMaterialsParams,
+    ListMaterialsResult,
+    ThinMaterial,
+} from './material.dto';
 
 // Create a global S3Service instance
 const s3Service = new S3Service();
@@ -90,12 +94,12 @@ export const listMaterials = async (
             {
                 model: Vendor,
                 as: 'vendor',
-                attributes: ['id', 'vendorName'],
+                attributes: ['id', 'vendor_name'],
             },
             {
                 model: Project,
                 as: 'project',
-                attributes: ['id', 'projectName'],
+                attributes: ['id', 'project_name'],
             },
         ],
         limit,
@@ -240,12 +244,12 @@ export const exportMaterials = async (
             {
                 model: Vendor,
                 as: 'vendor',
-                attributes: ['vendorName'],
+                attributes: ['vendor_name'],
             },
             {
                 model: Project,
                 as: 'project',
-                attributes: ['projectName'],
+                attributes: ['project_name'],
             },
         ],
         order: [['billDate', 'ASC']],
@@ -271,12 +275,12 @@ export const exportMaterials = async (
     materials.forEach(material => {
         worksheet.addRow({
             no: materialNo,
-            vendor: material.vendor?.vendorName,
+            vendor: material.vendor?.vendor_name,
             materialType: material.materialType?.name,
             unit: material.unit,
             quantity: material.quantity,
             materialSlug: material.materialType?.slug,
-            project: material.project?.projectName,
+            project: material.project?.project_name,
             billDate: material.billDate,
         });
         materialNo++;

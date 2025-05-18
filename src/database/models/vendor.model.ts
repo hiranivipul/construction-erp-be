@@ -2,8 +2,8 @@ import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 export interface VendorAttributes {
     id: string;
-    vendorName: string;
-    vendorAddress: string;
+    vendor_name: string;
+    vendor_address: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -18,8 +18,8 @@ export class Vendor
     implements VendorAttributes
 {
     public id!: string;
-    public vendorAddress!: string;
-    public vendorName!: string;
+    public vendor_address!: string;
+    public vendor_name!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
@@ -32,11 +32,11 @@ export default function (sequelize: Sequelize): typeof Vendor {
                 defaultValue: DataTypes.UUIDV4,
                 primaryKey: true,
             },
-            vendorName: {
+            vendor_name: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            vendorAddress: {
+            vendor_address: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },

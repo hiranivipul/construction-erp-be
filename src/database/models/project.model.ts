@@ -11,7 +11,7 @@ export enum ProjectStatusEnum {
 
 export interface ProjectAttributes {
     id: string;
-    projectName: string;
+    project_name: string;
     client: string;
     constructionSite: string;
     startDate: Date;
@@ -32,7 +32,7 @@ export class Project
     implements ProjectAttributes
 {
     public id!: string;
-    public projectName!: string;
+    public project_name!: string;
     public client!: string;
     public constructionSite!: string;
     public startDate!: Date;
@@ -51,7 +51,7 @@ export default function (sequelize: Sequelize): typeof Project {
                 defaultValue: DataTypes.UUIDV4,
                 primaryKey: true,
             },
-            projectName: {
+            project_name: {
                 type: DataTypes.STRING,
                 allowNull: false,
                 field: 'project_name',

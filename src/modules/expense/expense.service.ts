@@ -41,7 +41,7 @@ export const createExpense = async (
                 {
                     model: Project,
                     as: 'project',
-                    attributes: ['id', 'projectName'],
+                    attributes: ['id', 'project_name'],
                 },
                 {
                     model: User,
@@ -100,7 +100,7 @@ export const listExpenses = async ({
                 {
                     model: Project,
                     as: 'project',
-                    attributes: ['id', 'projectName'],
+                    attributes: ['id', 'project_name'],
                 },
                 {
                     model: User,
@@ -136,7 +136,7 @@ export const getExpenseById = async (id: string): Promise<Expense | null> => {
             {
                 model: Project,
                 as: 'project',
-                attributes: ['id', 'projectName'],
+                attributes: ['id', 'project_name'],
             },
             {
                 model: User,
@@ -188,7 +188,7 @@ export const exportExpenses = async (
                 {
                     model: Project,
                     as: 'project',
-                    attributes: ['projectName'],
+                    attributes: ['project_name'],
                 },
                 {
                     model: User,
@@ -223,8 +223,8 @@ export const exportExpenses = async (
             worksheet.addRow({
                 date: expenseData.date,
                 expense_scope: expenseData.expense_scope,
-                project: expenseData.project?.projectName || 'N/A',
-                vendor: expenseData.vendor?.vendorName || 'N/A',
+                project: expenseData.project?.project_name || 'N/A',
+                vendor: expenseData.vendor?.vendor_name || 'N/A',
                 description: expenseData.description || 'N/A',
                 amount: expenseData.amount,
                 created_by: expenseData.creator?.name || 'N/A',

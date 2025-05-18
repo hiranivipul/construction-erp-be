@@ -3,7 +3,7 @@ import { validationMessages } from '@utils/validation';
 import { ProjectStatusEnum } from '@database/models/project.model';
 
 export const createProjectSchema = Joi.object({
-    projectName: Joi.string()
+    project_name: Joi.string()
         .required()
         .min(3)
         .max(100)
@@ -68,7 +68,7 @@ export const createProjectSchema = Joi.object({
 
 export const updateProjectSchema = createProjectSchema.fork(
     [
-        'projectName',
+        'project_name',
         'client',
         'constructionSite',
         'startDate',
