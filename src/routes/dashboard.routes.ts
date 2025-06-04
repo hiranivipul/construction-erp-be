@@ -1,7 +1,8 @@
 import { Router } from 'express';
 
-import { requireRole, UserRole } from '@/middlewares/role.middleware';
+import { requireRole } from '@/middlewares/role.middleware';
 import { getState } from '@/modules/dashboard/dashboard.controller';
+import { UserRole } from '@/constants/roles';
 
 const dashboardRouter = Router();
 

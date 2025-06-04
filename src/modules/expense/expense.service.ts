@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import ExcelJS from 'exceljs';
-import { Expense } from '@database/models/expense';
+import { Expense } from '@/database/models/expense.model';
 import { Project } from '@database/models/project.model';
 import { User } from '@database/models/user.model';
 import { Vendor } from '@database/models/vendor.model';

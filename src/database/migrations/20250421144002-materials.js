@@ -8,6 +8,7 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.literal('gen_random_uuid()'),
                 primaryKey: true,
+                allowNull: false,
             },
             vendor_id: {
                 type: Sequelize.UUID,
@@ -16,8 +17,6 @@ module.exports = {
                     model: 'vendors',
                     key: 'id',
                 },
-                onUpdate: 'CASCADE',
-                onDelete: 'CASCADE',
             },
             material_type_id: {
                 type: Sequelize.UUID,
@@ -26,14 +25,20 @@ module.exports = {
                     model: 'material_types',
                     key: 'id',
                 },
-                onUpdate: 'CASCADE',
-                onDelete: 'CASCADE',
             },
             project_id: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
                     model: 'projects',
+                    key: 'id',
+                },
+            },
+            organization_id: {
+                type: Sequelize.UUID,
+                allowNull: false,
+                references: {
+                    model: 'organizations',
                     key: 'id',
                 },
                 onUpdate: 'CASCADE',
@@ -64,4 +69,4 @@ module.exports = {
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('materials');
     },
-}; 
+};

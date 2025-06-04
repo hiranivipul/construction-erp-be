@@ -177,3 +177,33 @@ export const exportMaterialTypes = async (
 
     return await workbook.xlsx.writeBuffer();
 };
+
+export const createDefaultMaterialTypes = async (organizationId: string): Promise<void> => {
+    const materialTypes = [
+        'Aggregate',
+        'Grit',
+        'Cement',
+        'Steel 8mm',
+        'Steel 10mm',
+        'Sand',
+        'Steel 12mm',
+        'Steel 16mm',
+        'Steel 20mm',
+        'Steel 25mm',
+    ];
+
+    const timestamp = new Date();
+    const records = materialTypes.map(name => ({
+        name,
+        organization_id: organizationId,
+        created_at: timestamp,
+        updated_at: timestamp,
+    }));
+
+    try {
+        await MaterialType.bulkCreate(records);
+    } catch (error) {
+        console.error('Error creating default material types:', error);
+        throw new AppError(500, 'Failed to create default material types');
+    }
+};

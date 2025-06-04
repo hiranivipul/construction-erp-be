@@ -3,37 +3,32 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('projects', {
+        await queryInterface.createTable('organizations', {
             id: {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.literal('gen_random_uuid()'),
                 primaryKey: true,
+                allowNull: false,
             },
-            project_name: {
+            name: {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
-            project_code: {
+            address: {
+                type: Sequelize.TEXT,
+                allowNull: true,
+            },
+            contact_no: {
                 type: Sequelize.STRING,
+                allowNull: true,
+            },
+            code: {
+                type: Sequelize.STRING(6),
                 allowNull: false,
                 unique: true,
-            },
-            start_date: {
-                type: Sequelize.DATE,
-                allowNull: false,
-            },
-            end_date: {
-                type: Sequelize.DATE,
-                allowNull: false,
-            },
-            budget: {
-                type: Sequelize.DECIMAL(15, 2),
-                allowNull: false,
-            },
-            status: {
-                type: Sequelize.ENUM('active', 'completed', 'on_hold', 'cancelled'),
-                allowNull: false,
-                defaultValue: 'active',
+                validate: {
+                    is: /^[A-Z]{2}\d{4}$/, // 2 uppercase letters followed by 4 digits
+                },
             },
             created_at: {
                 type: Sequelize.DATE,
@@ -49,6 +44,6 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('projects');
+        await queryInterface.dropTable('organizations');
     },
-}; 
+};

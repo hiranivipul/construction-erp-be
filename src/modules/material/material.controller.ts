@@ -27,7 +27,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
         req.body.billDate = new Date();
         const material = await createMaterial(req.body);
-        
+
         // Add signed URL for receipt if present
         const materialData = material.toJSON();
         if (materialData.receipt) {

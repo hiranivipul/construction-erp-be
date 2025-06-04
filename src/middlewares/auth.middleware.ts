@@ -1,40 +1,44 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import jwt from 'jsonwebtoken';
-import { authConfig } from '@/config/auth.config';
+import { verify } from 'jsonwebtoken';
+import { config } from '@utils/config';
 
-interface AuthRequest extends Request {
-    user?: any;
+export interface AuthRequest extends Request {
+    user?: {
+        id: string;
+        email: string;
+        role: string;
+        organizationId: string;
+    };
+    organizationId?: string;
 }
 
-export const authenticateToken: RequestHandler = (
+export const AuthMiddleware: RequestHandler = (
     req: AuthRequest,
     res: Response,
     next: NextFunction,
 ) => {
-    // Skip authentication for login route
-    if (req.path === '/api/auth/login') {
-        return next();
-    }
-
-    // Get the token from the Authorization header
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        res.status(401).json({
-            success: false,
-            message: 'Access denied. No token provided.',
-        });
-        return;
-    }
-
     try {
-        // Verify the token
-        const decoded = jwt.verify(token, authConfig.jwt.secret);
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            res.status(401).json({ message: 'No token provided' });
+            return;
+        }
 
-        // Add the decoded user information to the request
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            res.status(401).json({ message: 'Invalid token format' });
+            return;
+        }
+
+        const decoded = verify(token, config.jwt.secret) as {
+            id: string;
+            email: string;
+            role: string;
+            organizationId: string;
+        };
+
         req.user = decoded;
-
+        req.organizationId = decoded.organizationId;
         next();
     } catch (error) {
         res.status(401).json({

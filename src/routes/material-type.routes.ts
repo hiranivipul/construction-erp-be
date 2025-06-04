@@ -13,7 +13,8 @@ import {
     createMaterialTypeSchema,
     updateMaterialTypeSchema,
 } from '@/modules/material-type/material-type.validation';
-import { requireRole, UserRole } from '@/middlewares/role.middleware';
+import { requireRole } from '@/middlewares/role.middleware';
+import { UserRole } from '@/constants/roles';
 
 const router = Router();
 
@@ -32,7 +33,6 @@ router.get(
         UserRole.SUPER_ADMIN,
         UserRole.ACCOUNTANT,
         UserRole.PROJECT_MANAGER,
-        UserRole.VENDOR,
     ),
     list,
 );
@@ -46,7 +46,6 @@ router.get(
         UserRole.SUPER_ADMIN,
         UserRole.ACCOUNTANT,
         UserRole.PROJECT_MANAGER,
-        UserRole.VENDOR,
     ),
     getById,
 );

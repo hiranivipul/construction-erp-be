@@ -1,10 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-
-export enum UserRoleEnum {
-    SUPER_ADMIN = 'super_admin',
-    ACCOUNTANT = 'accountant',
-    USER = 'user',
-}
+import { UserRole } from '@/constants/roles';
 
 export interface UserAttributes {
     id: string;
@@ -12,14 +7,15 @@ export interface UserAttributes {
     email: string;
     password: string;
     avatar?: string;
-    role: UserRoleEnum;
+    role: UserRole;
+    organization_id: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export type UserCreationAttributes = Optional<
     UserAttributes,
-    'id' | 'createdAt' | 'updatedAt'
+    'id' | 'avatar' | 'createdAt' | 'updatedAt'
 >;
 
 export class User
@@ -31,7 +27,8 @@ export class User
     public email!: string;
     public password!: string;
     public avatar?: string;
-    public role!: UserRoleEnum;
+    public role!: UserRole;
+    public organization_id!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
@@ -51,7 +48,6 @@ export default function (sequelize: Sequelize): typeof User {
             email: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
                 validate: {
                     isEmail: true,
                 },
@@ -66,9 +62,17 @@ export default function (sequelize: Sequelize): typeof User {
                 defaultValue: null,
             },
             role: {
-                type: DataTypes.ENUM(...Object.values(UserRoleEnum)),
+                type: DataTypes.ENUM(...Object.values(UserRole)),
                 allowNull: false,
-                defaultValue: UserRoleEnum.USER,
+            },
+            organization_id: {
+                type: DataTypes.UUID,
+                allowNull: false,
+                field: 'organization_id',
+                references: {
+                    model: 'organizations',
+                    key: 'id',
+                },
             },
             createdAt: {
                 type: DataTypes.DATE,

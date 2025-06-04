@@ -1,6 +1,7 @@
 import { Project } from '@database/models/project.model';
 
 export interface ListProjectsParams {
+    organization_id: string;
     page?: number;
     limit?: number;
     search?: string;

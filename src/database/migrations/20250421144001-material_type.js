@@ -25,12 +25,19 @@ module.exports = {
           )
         );
         
-        -- Check if slug already exists and append number if needed
-        IF EXISTS (SELECT 1 FROM material_types WHERE slug = NEW.slug AND id != NEW.id) THEN
+        -- Check if slug already exists within the same organization and append number if needed
+        IF EXISTS (
+          SELECT 1 
+          FROM material_types 
+          WHERE slug = NEW.slug 
+          AND organization_id = NEW.organization_id 
+          AND id != NEW.id
+        ) THEN
           NEW.slug := NEW.slug || '-' || (
             SELECT count(*) + 1 
             FROM material_types 
             WHERE slug LIKE NEW.slug || '%'
+            AND organization_id = NEW.organization_id
           );
         END IF;
         
@@ -44,6 +51,7 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.literal('gen_random_uuid()'),
                 primaryKey: true,
+                allowNull: false,
             },
             name: {
                 type: Sequelize.STRING,
@@ -52,7 +60,16 @@ module.exports = {
             slug: {
                 type: Sequelize.STRING,
                 allowNull: false,
-                unique: true,
+            },
+            organization_id: {
+                type: Sequelize.UUID,
+                allowNull: false,
+                references: {
+                    model: 'organizations',
+                    key: 'id',
+                },
+                onUpdate: 'CASCADE',
+                onDelete: 'CASCADE',
             },
             created_at: {
                 type: Sequelize.DATE,
@@ -73,6 +90,13 @@ module.exports = {
       FOR EACH ROW
       EXECUTE FUNCTION generate_material_slug();
     `);
+
+        // Add composite unique constraint for name and organization_id
+        await queryInterface.addConstraint('material_types', {
+            fields: ['slug', 'organization_id'],
+            type: 'unique',
+            name: 'material_types_slug_organization_id_unique',
+        });
     },
 
     async down(queryInterface, Sequelize) {

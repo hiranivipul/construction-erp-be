@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 // Function to extract company name from website URL
 export const extractCompanyName = (url: string | undefined): string | null => {
     if (!url) return null;
@@ -30,4 +32,10 @@ export const extractFirstName = (
     if (!fullName) return null;
     const names = fullName.split(' '); // Split the full name by spaces
     return names[0].charAt(0).toUpperCase() + names[0].slice(1); // Capitalize the first letter of the first name
+};
+export const getOrganizationId = (req: Request): string | undefined => {
+    if (!req.organizationId) {
+        throw new Error('Organization ID is required');
+    }
+    return req.organizationId;
 };

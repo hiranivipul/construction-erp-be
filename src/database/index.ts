@@ -5,7 +5,7 @@ import materialModel from './models/material.model';
 import materialTypeModel from './models/material-type.model';
 import projectModel from './models/project.model';
 import vendorModel from './models/vendor.model';
-import expenseModel from './models/expense';
+import expenseModel from './models/expense.model';
 import {
     DB_DIALECT,
     DB_HOST,
@@ -15,6 +15,8 @@ import {
     DB_USERNAME,
     NODE_ENV,
 } from '@/config';
+import organizationModel from '@database/models/organization.model';
+import userOrganizationViewModel from './models/user-organization-view.model';
 
 export const sequelize = new Sequelize.Sequelize(
     DB_NAME as string,
@@ -48,9 +50,10 @@ const User = userModel(sequelize);
 const Material = materialModel(sequelize);
 const MaterialType = materialTypeModel(sequelize);
 const Projects = projectModel(sequelize);
+const Organizations = organizationModel(sequelize);
 const Vendor = vendorModel(sequelize);
 const Expense = expenseModel(sequelize);
-
+const UserOrganizationView = userOrganizationViewModel(sequelize);
 // Set up associations after all models are initialized
 Object.values(sequelize.models).forEach(model => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -71,6 +74,8 @@ export const DB = {
     Projects,
     Vendor,
     Expense,
+    Organizations,
+    UserOrganizationView,
     sequelize, // connection instance (RAW queries)
     Sequelize, // library
 };

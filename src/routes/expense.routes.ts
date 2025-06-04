@@ -12,7 +12,8 @@ import {
     createExpenseSchema,
     updateExpenseSchema,
 } from '@/modules/expense/expense.validation';
-import { requireRole, UserRole } from '@/middlewares/role.middleware';
+import { requireRole } from '@/middlewares/role.middleware';
+import { UserRole } from '@/constants/roles';
 
 const ExpenseRouter = Router();
 

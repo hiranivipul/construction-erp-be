@@ -11,6 +11,7 @@ export interface ExpenseAttributes {
     expense_scope: ExpenseScope;
     project_id: string | null;
     vendor_id: string | null;
+    organization_id: string;
     description: string | null;
     amount: number;
     created_by: string;
@@ -32,6 +33,7 @@ export class Expense extends Model<
     public expense_scope!: ExpenseScope;
     public project_id!: string | null;
     public vendor_id!: string | null;
+    public organization_id!: string;
     public description!: string | null;
     public amount!: number;
     public created_by!: string;
@@ -94,6 +96,15 @@ export default function (sequelize: Sequelize): typeof Expense {
                 field: 'vendor_id',
                 references: {
                     model: 'vendors',
+                    key: 'id',
+                },
+            },
+            organization_id: {
+                type: DataTypes.UUID,
+                allowNull: false,
+                field: 'organization_id',
+                references: {
+                    model: 'organizations',
                     key: 'id',
                 },
             },

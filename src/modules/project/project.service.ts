@@ -23,6 +23,7 @@ export const createProject = async (
         startDate: new Date(input.startDate),
         value: Number(input.value),
         status: ProjectStatusEnum.PENDING,
+        organization_id: input.organization_id,
     };
 
     // Add optional fields if they exist
@@ -45,7 +46,9 @@ export const listProjects = async (
     const limit = params.limit || 10;
     const offset = (page - 1) * limit;
 
-    const where: any = {};
+    const where: any = {
+        organization_id: params.organization_id,
+    };
 
     if (params.search) {
         where[Op.or] = [
@@ -80,11 +83,20 @@ export const listProjects = async (
     };
 };
 
-export const getProjectById = async (id: string): Promise<Project | null> => {
-    return Project.findByPk(id);
+export const getProjectById = async (
+    id: string,
+    organizationId: string,
+): Promise<Project | null> => {
+    return Project.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
+    });
 };
 
 export const exportProject = async (
+    organizationId: string,
     startDate?: Date,
     endDate?: Date,
 ): Promise<ExcelJS.Buffer> => {
@@ -99,7 +111,10 @@ export const exportProject = async (
         }
     }
 
-    const where: any = {};
+    const where: any = {
+        organization_id: organizationId,
+    };
+
     if (startDate && endDate) {
         where.startDate = {
             [Op.between]: [startDate, endDate],
@@ -147,7 +162,13 @@ export const updateProject = async (
     id: string,
     input: Partial<ProjectAttributes>,
 ): Promise<Project | null> => {
-    const project = await Project.findByPk(id);
+    const project = await Project.findOne({
+        where: {
+            id,
+            organization_id: input.organization_id,
+        },
+    });
+
     if (!project) {
         return null;
     }
@@ -167,8 +188,17 @@ export const updateProject = async (
     return project.update(updateData);
 };
 
-export const deleteProject = async (id: string): Promise<boolean> => {
-    const project = await Project.findByPk(id);
+export const deleteProject = async (
+    id: string,
+    organizationId: string,
+): Promise<boolean> => {
+    const project = await Project.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
+    });
+
     if (!project) {
         return false;
     }
@@ -177,16 +207,19 @@ export const deleteProject = async (id: string): Promise<boolean> => {
 };
 
 export const listThinProjects = async (
+    organizationId: string,
     search?: string,
 ): Promise<ThinProject[]> => {
     try {
-        const whereClause = search
-            ? {
-                  project_name: {
-                      [Op.iLike]: `%${search}%`,
-                  },
-              }
-            : {};
+        const whereClause: any = {
+            organization_id: organizationId,
+        };
+
+        if (search) {
+            whereClause.project_name = {
+                [Op.iLike]: `%${search}%`,
+            };
+        }
 
         return await Project.findAll({
             where: whereClause,

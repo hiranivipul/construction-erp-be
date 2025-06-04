@@ -10,6 +10,7 @@ export interface MaterialAttributes {
     vendorId: string;
     materialTypeId: string;
     projectId: string;
+    organization_id: string;
     receipt?: string;
     receiptImage?: string;
     billDate?: Date;
@@ -32,6 +33,7 @@ export class Material
     public vendorId!: string;
     public materialTypeId!: string;
     public projectId!: string;
+    public organization_id!: string;
     public receipt?: string;
     public receiptImage?: string;
     public readonly billDate?: Date;
@@ -98,6 +100,15 @@ export default function (sequelize: Sequelize): typeof Material {
                 field: 'project_id',
                 references: {
                     model: 'projects',
+                    key: 'id',
+                },
+            },
+            organization_id: {
+                type: DataTypes.UUID,
+                allowNull: false,
+                field: 'organization_id',
+                references: {
+                    model: 'organizations',
                     key: 'id',
                 },
             },

@@ -4,8 +4,14 @@ import { sign } from 'jsonwebtoken';
 import { config } from '@utils/config';
 import { createUser } from './auth.service';
 import { registerSchema, loginSchema } from './auth.validation';
-import { RegisterDto, LoginDto, AuthResponseDto } from './auth.dto';
-import { User } from '@database/models/user.model';
+import {
+    RegisterDto,
+    LoginDto,
+    AuthResponseDto,
+    UserCreateResponseDto,
+} from './auth.dto';
+import { UserOrganizationView } from '@database/models/user-organization-view.model';
+import { getOrganizationId } from '@/utils/helper';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -23,12 +29,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             });
             return;
         }
-
-        const { name, email, password, organizationId } = value as RegisterDto;
+        const organizationId = getOrganizationId(req);
+        const { email } = value as RegisterDto;
 
         // Check if user already exists
-        const existingUser = await User.findOne({
-            where: { email },
+        const existingUser = await UserOrganizationView.findOne({
+            where: { user_email: email, organization_id: organizationId },
         });
         if (existingUser) {
             res.status(400).json({ message: 'User already exists' });
@@ -36,21 +42,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         }
 
         // Create new user with schema instance from request
-        const user = await createUser(value as RegisterDto, req);
-
-        // Generate JWT token
-        const token = sign(
-            {
-                id: user.id,
-                email: user.email,
-                role: user.role,
-                organizationId,
-            },
-            config.jwt.secret,
-            { expiresIn: '24h' },
+        const user = await createUser(
+            { ...value, organization_id: organizationId },
+            req,
         );
 
-        const response: AuthResponseDto = {
+        const response: UserCreateResponseDto = {
             message: 'User registered successfully',
             user: {
                 id: user.id,
@@ -58,7 +55,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
                 email: user.email,
                 role: user.role,
             },
-            token,
         };
 
         res.status(201).json(response);
@@ -87,11 +83,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const { email, password, organizationId } = value as LoginDto;
+        const { email, password, code } = value as LoginDto;
 
         // Check if user exists using schema instance from request
-        const user = await User.findOne({
-            where: { email },
+        const user = await UserOrganizationView.findOne({
+            where: { user_email: email, organization_code: code },
         });
         if (!user) {
             res.status(401).json({ message: 'Invalid credentials' });
@@ -99,7 +95,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         // Verify password
-        const isPasswordValid = await compare(password, user.password);
+        const isPasswordValid = await compare(password, user.user_password);
         if (!isPasswordValid) {
             res.status(401).json({ message: 'Invalid credentials' });
             return;
@@ -108,10 +104,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         // Generate JWT token
         const token = sign(
             {
-                id: user.id,
-                email: user.email,
-                role: user.role,
-                organizationId,
+                id: user.user_id,
+                email: user.user_email,
+                role: user.user_role,
+                organizationId: user.organization_id,
             },
             config.jwt.secret,
             { expiresIn: '24h' },
@@ -120,10 +116,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         const response: AuthResponseDto = {
             message: 'Login successful',
             user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
+                id: user.user_id,
+                name: user.user_name,
+                email: user.user_email,
+                role: user.user_role,
             },
             token,
         };

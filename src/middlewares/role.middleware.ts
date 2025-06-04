@@ -1,16 +1,11 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { UserRole } from '@/constants/roles';
 
 interface AuthRequest extends Request {
     user?: {
         role: UserRole;
         [key: string]: any;
     };
-}
-export enum UserRole {
-    SUPER_ADMIN = 'super-admin',
-    ACCOUNTANT = 'accountant',
-    PROJECT_MANAGER = 'project-manager',
-    VENDOR = 'vendor',
 }
 
 export const requireRole = (...roles: UserRole[]): RequestHandler => {

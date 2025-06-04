@@ -13,7 +13,8 @@ import {
     createMaterialSchema,
     updateMaterialSchema,
 } from '@/modules/material/material.validation';
-import { requireRole, UserRole } from '@/middlewares/role.middleware';
+import { requireRole } from '@/middlewares/role.middleware';
+import { UserRole } from '@/constants/roles';
 
 const MaterialRouter = Router();
 
@@ -35,7 +36,6 @@ MaterialRouter.get(
         UserRole.SUPER_ADMIN,
         UserRole.ACCOUNTANT,
         UserRole.PROJECT_MANAGER,
-        UserRole.VENDOR,
     ),
     list,
 );
@@ -49,7 +49,6 @@ MaterialRouter.get(
         UserRole.SUPER_ADMIN,
         UserRole.ACCOUNTANT,
         UserRole.PROJECT_MANAGER,
-        UserRole.VENDOR,
     ),
     getById,
 );
@@ -70,6 +69,5 @@ MaterialRouter.delete(
     requireRole(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT),
     remove,
 );
-
 
 export default MaterialRouter;

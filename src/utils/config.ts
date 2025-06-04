@@ -24,6 +24,10 @@ export const config = {
                 process.env.AWS_S3_BUCKET_NAME || 'construction-erp-data',
         },
     },
+    superAdmin: {
+        email: process.env.SUPER_ADMIN_EMAIL,
+        password: process.env.SUPER_ADMIN_PASSWORD,
+    },
 };
 
 export const PORT = config.port;

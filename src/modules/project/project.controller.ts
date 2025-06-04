@@ -9,9 +9,14 @@ import {
     exportProject,
     listThinProjects,
 } from './project.service';
+import { getOrganizationId } from '@/utils/helper';
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
-        const project = await createProject(req.body);
+        const organizationId = getOrganizationId(req);  
+        const project = await createProject({
+            ...req.body,
+            organization_id: organizationId,
+        });
         res.status(201).json({
             message: 'Project created successfully',
             data: project,
@@ -43,12 +48,13 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const list = async (req: Request, res: Response): Promise<void> => {
     try {
         const { page, limit, search, status } = req.query;
-
+        const organizationId = getOrganizationId(req);
         const result = await listProjects({
             page: page ? parseInt(page as string) : undefined,
             limit: limit ? parseInt(limit as string) : undefined,
             search: search as string,
             status: status as ProjectStatusEnum,
+            organization_id: organizationId,
         });
 
         res.status(200).json(result);
@@ -63,7 +69,8 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 export const getById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const project = await getProjectById(id);
+        const organizationId = getOrganizationId(req);
+        const project = await getProjectById(id, organizationId);
 
         if (!project) {
             res.status(404).json({ message: 'Project not found' });
@@ -99,7 +106,12 @@ export const getExport = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const buffer = await exportProject(parsedStartDate, parsedEndDate);
+        const organizationId = getOrganizationId(req);
+        const buffer = await exportProject(
+            organizationId,
+            parsedStartDate,
+            parsedEndDate,
+        );
 
         res.setHeader(
             'Content-Type',
@@ -144,7 +156,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 export const remove = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const success = await deleteProject(id);
+        const organizationId = getOrganizationId(req);
+        const success = await deleteProject(id, organizationId);
 
         if (!success) {
             res.status(404).json({ message: 'Project not found' });
@@ -166,7 +179,11 @@ export const getThinProjects = async (
 ): Promise<void> => {
     try {
         const { search } = req.query;
-        const projects = await listThinProjects(search as string | undefined);
+        const organizationId = getOrganizationId(req);
+        const projects = await listThinProjects(
+            organizationId,
+            search as string | undefined,
+        );
         res.status(200).json({ data: projects });
     } catch (error) {
         console.error('Error in getThinProjects controller:', error);

@@ -11,9 +11,10 @@
         "lint": "eslint --ignore-path .gitignore --ext .ts src/",
         "lint:fix": "npm run lint -- --fix",
         "migration:generate": "sequelize migration:generate --name",
-        "migration": "sequelize db:migrate",
-        "migration:undo": "sequelize db:migrate:undo",
-        "seed": "sequelize db:seed:all"
+        "migration": "ts-node -r tsconfig-paths/register ./node_modules/.bin/sequelize db:migrate",
+        "migration:undo": "ts-node -r tsconfig-paths/register ./node_modules/.bin/sequelize db:migrate:undo",
+        "seed": "ts-node -r tsconfig-paths/register ./node_modules/.bin/sequelize db:seed:all",
+        "seed:undo": "ts-node -r tsconfig-paths/register ./node_modules/.bin/sequelize db:seed:undo:all"
     },
     "author": "",
     "license": "MIT",

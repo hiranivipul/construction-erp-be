@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { validationMessages } from '@utils/validation';
+import { UserRoleWithoutSuperAdmin } from '@/constants/roles';
 
 export const registerSchema = Joi.object({
     name: Joi.string()
@@ -26,12 +27,12 @@ export const registerSchema = Joi.object({
             'string.min': 'Password must be at least 6 characters long',
             'any.required': validationMessages.required('Password'),
         }),
-
-    organizationId: Joi.string()
+    role: Joi.string()
+        .valid(...Object.values(UserRoleWithoutSuperAdmin))
         .required()
         .messages({
-            'string.empty': validationMessages.required('Organization ID'),
-            'any.required': validationMessages.required('Organization ID'),
+            'string.empty': validationMessages.required('Role'),
+            'any.required': validationMessages.required('Role'),
         }),
 });
 
@@ -52,12 +53,16 @@ export const loginSchema = Joi.object({
             'any.required': validationMessages.required('Password'),
         }),
 
-    // organizationId: Joi.string()
-    //     .required()
-    //     .messages({
-    //         'string.empty': validationMessages.required('Organization ID'),
-    //         'any.required': validationMessages.required('Organization ID'),
-    //     }),
+    code: Joi.string()
+        .required()
+        .messages({
+            'string.empty': validationMessages.required(
+                'Organization Code is required',
+            ),
+            'any.required': validationMessages.required(
+                'Organization Code is required',
+            ),
+        }),
 });
 
 export const validateLoginInput = (req: any, res: any, next: any) => {

@@ -1,18 +1,18 @@
 'use strict';
 
+const { ProjectStatusValues } = require('../../constants/project');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable('projects', {
             id: {
                 type: Sequelize.UUID,
-                defaultValue: Sequelize.UUIDV4,
+                defaultValue: Sequelize.literal('gen_random_uuid()'),
                 primaryKey: true,
             },
             project_name: {
                 type: Sequelize.STRING,
                 allowNull: false,
-                unique: true,
             },
             client: {
                 type: Sequelize.STRING,
@@ -36,15 +36,26 @@ module.exports = {
             },
             status: {
                 type: Sequelize.ENUM(
-                    'pending',
-                    'confirm',
-                    'ongoing',
-                    'completed',
-                    'stop',
-                    'leave',
+                    ProjectStatusValues.PENDING,
+                    ProjectStatusValues.CONFIRM,
+                    ProjectStatusValues.ONGOING,
+                    ProjectStatusValues.COMPLETED,
+                    ProjectStatusValues.ON_HOLD,
+                    ProjectStatusValues.LEAVE,
+                    ProjectStatusValues.CANCELLED,
                 ),
                 allowNull: false,
                 defaultValue: 'pending',
+            },
+            organization_id: {
+                type: Sequelize.UUID,
+                allowNull: false,
+                references: {
+                    model: 'organizations',
+                    key: 'id',
+                },
+                onUpdate: 'CASCADE',
+                onDelete: 'CASCADE',
             },
             created_at: {
                 type: Sequelize.DATE,
@@ -56,6 +67,13 @@ module.exports = {
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
             },
+        });
+
+        // Add composite unique constraint for project_name and organization_id
+        await queryInterface.addConstraint('projects', {
+            fields: ['project_name', 'organization_id'],
+            type: 'unique',
+            name: 'projects_project_name_organization_id_unique',
         });
     },
 

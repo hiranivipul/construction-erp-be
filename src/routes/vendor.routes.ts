@@ -13,7 +13,8 @@ import {
     createVendorSchema,
     updateVendorSchema,
 } from '@/modules/vendor/vendor.validation';
-import { requireRole, UserRole } from '@/middlewares/role.middleware';
+import { requireRole } from '@/middlewares/role.middleware';
+import { UserRole } from '@/constants/roles';
 
 const VendorRouter = Router();
 
@@ -55,7 +56,5 @@ VendorRouter.put(
 );
 
 VendorRouter.delete('/:id', requireRole(UserRole.SUPER_ADMIN), remove);
-
-
 
 export default VendorRouter;

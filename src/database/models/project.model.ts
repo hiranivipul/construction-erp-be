@@ -18,6 +18,7 @@ export interface ProjectAttributes {
     endDate?: Date;
     value: number;
     status: ProjectStatusEnum;
+    organization_id: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -39,6 +40,7 @@ export class Project
     public endDate?: Date;
     public value!: number;
     public status!: ProjectStatusEnum;
+    public organization_id!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
@@ -84,6 +86,15 @@ export default function (sequelize: Sequelize): typeof Project {
                 type: DataTypes.ENUM(...Object.values(ProjectStatusEnum)),
                 allowNull: false,
                 defaultValue: ProjectStatusEnum.PENDING,
+            },
+            organization_id: {
+                type: DataTypes.UUID,
+                allowNull: false,
+                field: 'organization_id',
+                references: {
+                    model: 'organizations',
+                    key: 'id',
+                },
             },
         },
         {

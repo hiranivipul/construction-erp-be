@@ -13,7 +13,8 @@ import {
     getExport,
     getThinProjects,
 } from '@/modules/project/project.controller';
-import { requireRole, UserRole } from '@/middlewares/role.middleware';
+import { requireRole } from '@/middlewares/role.middleware';
+import { UserRole } from '@/constants/roles';
 
 const ProjectRouter = Router();
 
