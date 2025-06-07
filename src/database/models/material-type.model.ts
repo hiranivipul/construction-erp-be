@@ -12,7 +12,7 @@ export interface MaterialTypeAttributes {
 
 export type MaterialTypeCreationAttributes = Optional<
     MaterialTypeAttributes,
-    'id' | 'createdAt' | 'updatedAt'
+    'id' | 'createdAt' | 'updatedAt' | 'organization_id'
 >;
 
 export class MaterialType

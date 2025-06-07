@@ -25,7 +25,7 @@ export interface ProjectAttributes {
 
 export type ProjectCreationAttributes = Optional<
     ProjectAttributes,
-    'id' | 'endDate' | 'createdAt' | 'updatedAt'
+    'id' | 'endDate' | 'createdAt' | 'updatedAt' | 'organization_id'
 >;
 
 export class Project

@@ -1,5 +1,5 @@
 import { MaterialType } from '@database/models/material-type.model';
-import { Op } from 'sequelize';
+import { ForeignKeyConstraintError, Op } from 'sequelize';
 import ExcelJS from 'exceljs';
 import { AppError } from '@utils/app-error';
 import {
@@ -13,16 +13,29 @@ import {
 export const createMaterialType = async (
     input: CreateMaterialTypeInput,
 ): Promise<MaterialType> => {
-    // Check if material type with same name already exists
-    const existingMaterialType = await MaterialType.findOne({
-        where: { name: input.name },
-    });
+    try {
+        // Check if material type with same name already exists
+        const existingMaterialType = await MaterialType.findOne({
+            where: { name: input.name },
+        });
 
-    if (existingMaterialType) {
-        throw new AppError(400, 'Material type with this name already exists');
+        if (existingMaterialType) {
+            throw new AppError(
+                400,
+                'Material type with this name already exists',
+            );
+        }
+
+        return MaterialType.create(input);
+    } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            throw new AppError(
+                400,
+                'Material type with this name already exists',
+            );
+        }
+        throw error;
     }
-
-    return MaterialType.create(input);
 };
 
 export const listMaterialTypes = async (
@@ -41,7 +54,10 @@ export const listMaterialTypes = async (
     }
 
     const { count, rows } = await MaterialType.findAndCountAll({
-        where,
+        where: {
+            ...where,
+            organization_id: params.organization_id,
+        },
         limit,
         offset,
         order: [['createdAt', 'DESC']],
@@ -56,9 +72,15 @@ export const listMaterialTypes = async (
 };
 
 export const getMaterialTypeById = async (
+    organizationId: string,
     id: string,
 ): Promise<MaterialType> => {
-    const materialType = await MaterialType.findByPk(id);
+    const materialType = await MaterialType.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
+    });
     if (!materialType) {
         throw new AppError(404, 'Material type not found');
     }
@@ -94,16 +116,35 @@ export const updateMaterialType = async (
     return materialType.update(input);
 };
 
-export const deleteMaterialType = async (id: string): Promise<void> => {
-    const materialType = await MaterialType.findByPk(id);
-    if (!materialType) {
-        throw new AppError(404, 'Material type not found');
-    }
+export const deleteMaterialType = async (
+    organizationId: string,
+    id: string,
+): Promise<void> => {
+    try {
+        const materialType = await MaterialType.findOne({
+            where: {
+                id,
+                organization_id: organizationId,
+            },
+        });
+        if (!materialType) {
+            throw new AppError(404, 'Material type not found');
+        }
 
-    await materialType.destroy();
+        await materialType.destroy();
+    } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            throw new AppError(
+                400,
+                'Material type is associated with materials, please delete the materials first',
+            );
+        }
+        throw error;
+    }
 };
 
 export const listThinMaterialTypes = async (
+    organizationId: string,
     search?: string,
 ): Promise<ThinMaterialType[]> => {
     try {
@@ -116,7 +157,10 @@ export const listThinMaterialTypes = async (
             : {};
 
         return await MaterialType.findAll({
-            where: whereClause,
+            where: {
+                ...whereClause,
+                organization_id: organizationId,
+            },
             attributes: ['id', 'name', 'slug'],
             order: [['name', 'ASC']],
         });
@@ -127,6 +171,7 @@ export const listThinMaterialTypes = async (
 };
 
 export const exportMaterialTypes = async (
+    organizationId: string,
     startDate?: Date,
     endDate?: Date,
 ): Promise<ExcelJS.Buffer> => {
@@ -149,7 +194,10 @@ export const exportMaterialTypes = async (
     }
 
     const materialTypes = await MaterialType.findAll({
-        where,
+        where: {
+            ...where,
+            organization_id: organizationId,
+        },
         attributes: ['id', 'name', 'slug'],
         order: [['createdAt', 'ASC']],
     });
@@ -178,7 +226,9 @@ export const exportMaterialTypes = async (
     return await workbook.xlsx.writeBuffer();
 };
 
-export const createDefaultMaterialTypes = async (organizationId: string): Promise<void> => {
+export const createDefaultMaterialTypes = async (
+    organizationId: string,
+): Promise<void> => {
     const materialTypes = [
         'Aggregate',
         'Grit',

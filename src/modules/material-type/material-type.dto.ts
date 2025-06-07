@@ -1,6 +1,7 @@
 import { MaterialType } from '@database/models/material-type.model';
 
 export interface ListMaterialTypesParams {
+    organization_id: string;
     page?: number;
     limit?: number;
     search?: string;
@@ -22,6 +23,7 @@ export interface ThinMaterialType {
 export interface CreateMaterialTypeInput {
     name: string;
     description?: string;
+    organization_id: string;
 }
 
 export interface UpdateMaterialTypeInput {

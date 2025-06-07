@@ -13,61 +13,18 @@ import {
     createMaterialSchema,
     updateMaterialSchema,
 } from '@/modules/material/material.validation';
-import { requireRole } from '@/middlewares/role.middleware';
-import { UserRole } from '@/constants/roles';
+import { Permission } from '@/constants/permissions';
+import { requirePermission } from '@/middlewares/permission.middleware';
 
 const MaterialRouter = Router();
 
 // Routes
-MaterialRouter.post(
-    '/',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    validateRequest(createMaterialSchema),
-    create,
-);
-
-MaterialRouter.get(
-    '/',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    list,
-);
-MaterialRouter.get('/thin', getThinMaterialTypes);
-
-MaterialRouter.get('/export', getExport);
-
-MaterialRouter.get(
-    '/:id',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    getById,
-);
-
-MaterialRouter.put(
-    '/:id',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    validateRequest(updateMaterialSchema),
-    update,
-);
-
-MaterialRouter.delete(
-    '/:id',
-    requireRole(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT),
-    remove,
-);
+MaterialRouter.post('/',requirePermission(Permission.MATERIAL_CREATE),validateRequest(createMaterialSchema),create);
+MaterialRouter.get('/',requirePermission(Permission.MATERIAL_READ),list);
+MaterialRouter.get('/thin',requirePermission(Permission.MATERIAL_READ), getThinMaterialTypes);
+MaterialRouter.get('/export',requirePermission(Permission.MATERIAL_READ), getExport);
+MaterialRouter.get('/:id',requirePermission(Permission.MATERIAL_READ),getById);
+MaterialRouter.put('/:id',requirePermission(Permission.MATERIAL_UPDATE, [Permission.MATERIAL_READ]),validateRequest(updateMaterialSchema),update);
+MaterialRouter.delete('/:id',requirePermission(Permission.MATERIAL_DELETE),remove);
 
 export default MaterialRouter;

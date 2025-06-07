@@ -12,68 +12,17 @@ import {
     createExpenseSchema,
     updateExpenseSchema,
 } from '@/modules/expense/expense.validation';
-import { requireRole } from '@/middlewares/role.middleware';
-import { UserRole } from '@/constants/roles';
+import { requirePermission } from '@/middlewares/permission.middleware';
+import { Permission } from '@/constants/permissions';
 
 const ExpenseRouter = Router();
 
 // Routes
-ExpenseRouter.post(
-    '/',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    validateRequest(createExpenseSchema),
-    create,
-);
-
-ExpenseRouter.get(
-    '/',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    list,
-);
-
-ExpenseRouter.get(
-    '/export',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    getExport,
-);
-
-ExpenseRouter.get(
-    '/:id',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    getById,
-);
-
-ExpenseRouter.put(
-    '/:id',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    validateRequest(updateExpenseSchema),
-    update,
-);
-
-ExpenseRouter.delete(
-    '/:id',
-    requireRole(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT),
-    remove,
-);
+ExpenseRouter.post('/',requirePermission(Permission.EXPENSE_CREATE),validateRequest(createExpenseSchema),create);
+ExpenseRouter.get('/',requirePermission(Permission.EXPENSE_READ),list);
+ExpenseRouter.get('/export',requirePermission(Permission.EXPENSE_READ),getExport);
+ExpenseRouter.get('/:id',requirePermission(Permission.EXPENSE_READ),getById);
+ExpenseRouter.put('/:id',requirePermission(Permission.EXPENSE_UPDATE),validateRequest(updateExpenseSchema),update);
+ExpenseRouter.delete('/:id',requirePermission(Permission.EXPENSE_DELETE),remove);
 
 export default ExpenseRouter;

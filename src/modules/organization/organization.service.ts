@@ -2,7 +2,7 @@ import {
     Organization,
     OrganizationAttributes,
 } from '@database/models/organization.model';
-import { Op } from 'sequelize';
+import { ForeignKeyConstraintError, Op } from 'sequelize';
 import {
     ListOrganizationsParams,
     ListOrganizationsResult,
@@ -123,6 +123,7 @@ export const updateOrganization = async (
 };
 
 export const deleteOrganization = async (id: string): Promise<void> => {
+    try {
     const organization = await Organization.findOne({
         where: { id },
     });
@@ -131,7 +132,13 @@ export const deleteOrganization = async (id: string): Promise<void> => {
         throw AppError.notFound('Organization not found');
     }
 
-    await organization.destroy();
+        await organization.destroy();
+    } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            throw new AppError(400, 'Organization is associated with other module, please delete first from other module');
+        }
+        throw error;
+    }
 };
 
 export const listThinOrganizations = async (

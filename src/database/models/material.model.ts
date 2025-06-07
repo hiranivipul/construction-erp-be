@@ -22,7 +22,7 @@ export interface MaterialAttributes {
 
 export type MaterialCreationAttributes = Optional<
     MaterialAttributes,
-    'id' | 'createdAt' | 'updatedAt'
+    'id' | 'createdAt' | 'updatedAt' | 'organization_id'
 >;
 
 export class Material

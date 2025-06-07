@@ -13,56 +13,18 @@ import {
     getExport,
     getThinProjects,
 } from '@/modules/project/project.controller';
-import { requireRole } from '@/middlewares/role.middleware';
-import { UserRole } from '@/constants/roles';
+import { requirePermission } from '@/middlewares/permission.middleware';
+import { Permission } from '@/constants/permissions';
 
 const ProjectRouter = Router();
 
 // Routes
-ProjectRouter.post(
-    '/',
-    requireRole(UserRole.SUPER_ADMIN, UserRole.PROJECT_MANAGER),
-    validateRequest(createProjectSchema),
-    create,
-);
-
-ProjectRouter.get(
-    '/',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    list,
-);
-ProjectRouter.get('/thin', getThinProjects);
-
-ProjectRouter.get(
-    '/export',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    getExport,
-);
-ProjectRouter.get(
-    '/:id',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    getById,
-);
-
-ProjectRouter.put(
-    '/:id',
-    requireRole(UserRole.SUPER_ADMIN, UserRole.PROJECT_MANAGER),
-    validateRequest(updateProjectSchema),
-    update,
-);
-
-ProjectRouter.delete('/:id', requireRole(UserRole.SUPER_ADMIN), remove);
+ProjectRouter.post('/',requirePermission(Permission.PROJECT_CREATE),validateRequest(createProjectSchema),create);
+ProjectRouter.get('/',requirePermission(Permission.PROJECT_READ),list);
+ProjectRouter.get('/thin', requirePermission(Permission.PROJECT_READ), getThinProjects);
+ProjectRouter.get('/export',requirePermission(Permission.PROJECT_READ),getExport);
+ProjectRouter.get('/:id',requirePermission(Permission.PROJECT_READ),getById);
+ProjectRouter.put('/:id',requirePermission(Permission.PROJECT_UPDATE, [Permission.PROJECT_READ]),validateRequest(updateProjectSchema),update);
+ProjectRouter.delete('/:id', requirePermission(Permission.PROJECT_DELETE), remove);
 
 export default ProjectRouter;

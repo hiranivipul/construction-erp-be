@@ -7,6 +7,7 @@ import { Vendor } from '@database/models/vendor.model';
 import { CreateExpenseDto, UpdateExpenseDto } from './expense.dto';
 
 export interface ListExpensesParams {
+    organization_id: string;
     page?: number;
     limit?: number;
     search?: string;
@@ -23,6 +24,7 @@ export interface ListExpensesResult {
 
 export const createExpense = async (
     data: CreateExpenseDto,
+    organizationId: string,
     userId: string,
 ): Promise<Expense> => {
     try {
@@ -33,6 +35,7 @@ export const createExpense = async (
 
         const expense = await Expense.create({
             ...data,
+            organization_id: organizationId,
             created_by: userId,
         });
 
@@ -62,6 +65,7 @@ export const createExpense = async (
 };
 
 export const listExpenses = async ({
+    organization_id,
     page = 1,
     limit = 10,
     search,
@@ -95,7 +99,10 @@ export const listExpenses = async ({
         }
 
         const { count, rows } = await Expense.findAndCountAll({
-            where,
+            where: {
+                ...where,
+                organization_id,
+            },
             include: [
                 {
                     model: Project,
@@ -130,8 +137,12 @@ export const listExpenses = async ({
     }
 };
 
-export const getExpenseById = async (id: string): Promise<Expense | null> => {
-    return await Expense.findByPk(id, {
+export const getExpenseById = async (organizationId: string, id: string): Promise<Expense | null> => {
+    return await Expense.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
         include: [
             {
                 model: Project,
@@ -155,15 +166,26 @@ export const getExpenseById = async (id: string): Promise<Expense | null> => {
 export const updateExpense = async (
     id: string,
     data: UpdateExpenseDto,
+    organizationId: string,
 ): Promise<Expense | null> => {
-    const expense = await Expense.findByPk(id);
+    const expense = await Expense.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
+    });
     if (!expense) return null;
 
     return await expense.update(data);
 };
 
-export const deleteExpense = async (id: string): Promise<boolean> => {
-    const expense = await Expense.findByPk(id);
+export const deleteExpense = async (organizationId: string, id: string): Promise<boolean> => {
+    const expense = await Expense.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
+    });
     if (!expense) return false;
 
     await expense.destroy();
@@ -171,6 +193,7 @@ export const deleteExpense = async (id: string): Promise<boolean> => {
 };
 
 export const exportExpenses = async (
+    organizationId: string,
     startDate?: Date,
     endDate?: Date,
 ): Promise<ExcelJS.Buffer> => {
@@ -183,7 +206,10 @@ export const exportExpenses = async (
         }
 
         const expenses = await Expense.findAll({
-            where,
+            where: {
+                ...where,
+                organization_id: organizationId,
+            },
             include: [
                 {
                     model: Project,

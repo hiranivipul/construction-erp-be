@@ -1,6 +1,7 @@
 import { Vendor } from '@database/models/vendor.model';
 
 export interface ListVendorsParams {
+    organization_id: string;
     page?: number;
     limit?: number;
     search?: string;

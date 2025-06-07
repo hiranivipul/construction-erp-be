@@ -13,48 +13,18 @@ import {
     createVendorSchema,
     updateVendorSchema,
 } from '@/modules/vendor/vendor.validation';
-import { requireRole } from '@/middlewares/role.middleware';
-import { UserRole } from '@/constants/roles';
+import { requirePermission } from '@/middlewares/permission.middleware';
+import { Permission } from '@/constants/permissions';
 
 const VendorRouter = Router();
 
 // Routes
-VendorRouter.post(
-    '/',
-    requireRole(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT),
-    validateRequest(createVendorSchema),
-    create,
-);
-
-VendorRouter.get(
-    '/',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    list,
-);
-VendorRouter.get('/thin', getThinVendors);
-VendorRouter.get('/export', getExport);
-
-VendorRouter.get(
-    '/:id',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    getById,
-);
-
-VendorRouter.put(
-    '/:id',
-    requireRole(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT),
-    validateRequest(updateVendorSchema),
-    update,
-);
-
-VendorRouter.delete('/:id', requireRole(UserRole.SUPER_ADMIN), remove);
+VendorRouter.post('/', requirePermission(Permission.VENDOR_CREATE), validateRequest(createVendorSchema), create);
+VendorRouter.get('/', requirePermission(Permission.VENDOR_READ), list);
+VendorRouter.get('/thin', requirePermission(Permission.VENDOR_READ), getThinVendors);
+VendorRouter.get('/export', requirePermission(Permission.VENDOR_READ), getExport);
+VendorRouter.get('/:id', requirePermission(Permission.VENDOR_READ), getById);
+VendorRouter.put('/:id', requirePermission(Permission.VENDOR_UPDATE, [Permission.VENDOR_READ]), validateRequest(updateVendorSchema), update);
+VendorRouter.delete('/:id', requirePermission(Permission.VENDOR_DELETE), remove);
 
 export default VendorRouter;

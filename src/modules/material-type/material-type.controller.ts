@@ -9,10 +9,16 @@ import {
     exportMaterialTypes,
 } from './material-type.service';
 import { AppError } from '@utils/app-error';
+import { getOrganizationId } from '@/utils/helper';
+import { ForeignKeyConstraintError, Sequelize } from 'sequelize';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
-        const materialType = await createMaterialType(req.body);
+        const organizationId = getOrganizationId(req);
+        const materialType = await createMaterialType({
+            ...req.body,
+            organization_id: organizationId,
+        });
         res.status(201).json({
             success: true,
             data: materialType,
@@ -37,7 +43,9 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const list = async (req: Request, res: Response): Promise<void> => {
     try {
         const { page, limit, search } = req.query;
+        const organizationId = getOrganizationId(req);
         const result = await listMaterialTypes({
+            organization_id: organizationId,
             page: page ? parseInt(page as string) : undefined,
             limit: limit ? parseInt(limit as string) : undefined,
             search: search as string,
@@ -55,7 +63,11 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 
 export const getById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const materialType = await getMaterialTypeById(req.params.id);
+        const organizationId = getOrganizationId(req);
+        const materialType = await getMaterialTypeById(
+            organizationId,
+            req.params.id,
+        );
         res.status(200).json({
             success: true,
             data: materialType,
@@ -79,7 +91,11 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
 
 export const update = async (req: Request, res: Response): Promise<void> => {
     try {
-        const materialType = await updateMaterialType(req.params.id, req.body);
+        const organizationId = getOrganizationId(req);
+        const materialType = await updateMaterialType(req.params.id, {
+            ...req.body,
+            organization_id: organizationId,
+        });
         res.status(200).json({
             success: true,
             data: materialType,
@@ -103,7 +119,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
 export const remove = async (req: Request, res: Response): Promise<void> => {
     try {
-        await deleteMaterialType(req.params.id);
+        const organizationId = getOrganizationId(req);
+        await deleteMaterialType(organizationId, req.params.id);
         res.status(200).json({
             success: true,
             message: 'Material type deleted successfully',
@@ -115,7 +132,6 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
                 message: error.message,
             });
         } else {
-            console.error('Error deleting material type:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to delete material type',
@@ -131,7 +147,9 @@ export const getThinMaterialTypes = async (
 ): Promise<void> => {
     try {
         const { search } = req.query;
+        const organizationId = getOrganizationId(req);
         const materialTypes = await listThinMaterialTypes(
+            organizationId,
             search as string | undefined,
         );
         res.status(200).json({
@@ -151,7 +169,7 @@ export const getThinMaterialTypes = async (
 export const getExport = async (req: Request, res: Response): Promise<void> => {
     try {
         const { startDate, endDate } = req.query;
-
+        const organizationId = getOrganizationId(req);
         // Parse dates if provided
         const parsedStartDate = startDate
             ? new Date(startDate as string)
@@ -175,6 +193,7 @@ export const getExport = async (req: Request, res: Response): Promise<void> => {
         }
 
         const buffer = await exportMaterialTypes(
+            organizationId,
             parsedStartDate,
             parsedEndDate,
         );

@@ -8,6 +8,7 @@ import {
     exportExpenses,
 } from './expense.service';
 import { validateExpenseInput } from './expense.validation';
+import { getOrganizationId } from '@/utils/helper';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -22,8 +23,8 @@ export const create = async (req: Request, res: Response): Promise<void> => {
             });
             return;
         }
-
-        const expense = await createExpense(req.body, req.user.id);
+        const organizationId = getOrganizationId(req);
+        const expense = await createExpense(req.body, organizationId, req.user.id);
 
         res.status(201).json({
             message: 'Expense created successfully',
@@ -42,8 +43,9 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const list = async (req: Request, res: Response): Promise<void> => {
     try {
         const { page, limit, search, startDate, endDate } = req.query;
-
+        const organizationId = getOrganizationId(req);
         const result = await listExpenses({
+            organization_id: organizationId,
             page: page ? parseInt(page as string) : undefined,
             limit: limit ? parseInt(limit as string) : undefined,
             search: search as string,
@@ -61,7 +63,8 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 export const getById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const expense = await getExpenseById(id);
+        const organizationId = getOrganizationId(req);
+        const expense = await getExpenseById(organizationId, id);
 
         if (!expense) {
             res.status(404).json({ message: 'Expense not found' });
@@ -92,7 +95,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const expense = await updateExpense(id, req.body);
+        const organizationId = getOrganizationId(req);
+        const expense = await updateExpense(id, req.body, organizationId);
 
         if (!expense) {
             res.status(404).json({ message: 'Expense not found' });
@@ -114,7 +118,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 export const remove = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const success = await deleteExpense(id);
+        const organizationId = getOrganizationId(req);
+        const success = await deleteExpense(organizationId, id);
 
         if (!success) {
             res.status(404).json({ message: 'Expense not found' });
@@ -150,7 +155,8 @@ export const getExport = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const buffer = await exportExpenses(parsedStartDate, parsedEndDate);
+        const organizationId = getOrganizationId(req);
+        const buffer = await exportExpenses(organizationId, parsedStartDate, parsedEndDate);
 
         res.setHeader(
             'Content-Type',

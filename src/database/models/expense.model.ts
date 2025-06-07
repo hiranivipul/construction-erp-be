@@ -21,7 +21,7 @@ export interface ExpenseAttributes {
 
 export type ExpenseCreationAttributes = Optional<
     ExpenseAttributes,
-    'id' | 'created_at' | 'updated_at'
+    'id' | 'created_at' | 'updated_at' | 'organization_id'
 >;
 
 export class Expense extends Model<

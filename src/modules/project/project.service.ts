@@ -4,13 +4,14 @@ import {
     ProjectCreationAttributes,
     ProjectStatusEnum,
 } from '@database/models/project.model';
-import { Op } from 'sequelize';
+import { ForeignKeyConstraintError, Op } from 'sequelize';
 import ExcelJS from 'exceljs';
 import {
     ListProjectsParams,
     ListProjectsResult,
     ThinProject,
 } from './project.dto';
+import { AppError } from '@/utils/app-error';
 
 export const createProject = async (
     input: ProjectCreationAttributes,
@@ -192,6 +193,7 @@ export const deleteProject = async (
     id: string,
     organizationId: string,
 ): Promise<boolean> => {
+    try {
     const project = await Project.findOne({
         where: {
             id,
@@ -202,8 +204,14 @@ export const deleteProject = async (
     if (!project) {
         return false;
     }
-    await project.destroy();
-    return true;
+        await project.destroy();
+        return true;
+    } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            throw new AppError(400, 'Project is associated with other module, please delete first from other module');
+        }
+        throw error;
+    }
 };
 
 export const listThinProjects = async (

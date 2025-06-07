@@ -10,6 +10,7 @@ import {
     listThinProjects,
 } from './project.service';
 import { getOrganizationId } from '@/utils/helper';
+import { ForeignKeyConstraintError } from 'sequelize';
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
         const organizationId = getOrganizationId(req);  
@@ -50,11 +51,11 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         const { page, limit, search, status } = req.query;
         const organizationId = getOrganizationId(req);
         const result = await listProjects({
+            organization_id: organizationId,
             page: page ? parseInt(page as string) : undefined,
             limit: limit ? parseInt(limit as string) : undefined,
             search: search as string,
             status: status as ProjectStatusEnum,
-            organization_id: organizationId,
         });
 
         res.status(200).json(result);
@@ -167,6 +168,12 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
         res.status(200).json({ message: 'Project deleted successfully' });
         return;
     } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            res.status(400).json({
+                success: false,
+                message: 'Project is associated with other module, please delete first from other module',
+            });
+        }
         console.error('Delete project error:', error);
         res.status(500).json({ message: 'Internal server error' });
         return;

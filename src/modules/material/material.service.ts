@@ -4,7 +4,7 @@ import {
     MaterialCreationAttributes,
 } from '@database/models/material.model';
 import { MaterialType } from '@database/models/material-type.model';
-import { Op } from 'sequelize';
+import { ForeignKeyConstraintError, Op } from 'sequelize';
 import ExcelJS from 'exceljs';
 import { Vendor } from '@database/models/vendor.model';
 import { Project } from '@database/models/project.model';
@@ -14,6 +14,7 @@ import {
     ListMaterialsResult,
     ThinMaterial,
 } from './material.dto';
+import { AppError } from '@/utils/app-error';
 
 // Create a global S3Service instance
 const s3Service = new S3Service();
@@ -47,7 +48,9 @@ export const createMaterial = async (
 
         return await Material.create(input);
     } catch (error) {
-        console.error('Error creating material:', error);
+        if (error instanceof ForeignKeyConstraintError) {
+            throw new AppError(400, 'Material type is associated with materials, please delete the materials first');
+        }
         throw error;
     }
 };
@@ -132,8 +135,12 @@ export const listMaterials = async (
     };
 };
 
-export const getMaterialById = async (id: string): Promise<Material | null> => {
-    return Material.findByPk(id, {
+export const getMaterialById = async (organizationId: string, id: string): Promise<Material | null> => {
+    return Material.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
         include: [
             {
                 model: MaterialType,
@@ -155,7 +162,12 @@ export const updateMaterial = async (
     id: string,
     input: Partial<MaterialAttributes>,
 ): Promise<Material | null> => {
-    const material = await Material.findByPk(id);
+    const material = await Material.findOne({
+        where: {
+            id,
+            organization_id: input.organization_id,
+        },
+    });
     if (!material) {
         return null;
     }
@@ -171,7 +183,7 @@ export const updateMaterial = async (
         const timestamp = Date.now();
         const randomString = Math.random().toString(36).substring(7);
         const key = `${organizationPrefix}/material-invoice/${timestamp}-${randomString}.${extension}`;
-        const materialCurrent = await getMaterialById(id);
+        const materialCurrent = await getMaterialById(input.organization_id, id);
         await s3Service.deleteFile(materialCurrent?.receipt);
         // Upload to S3
         input.receipt = await s3Service.uploadFile(buffer, key, contentType);
@@ -179,16 +191,29 @@ export const updateMaterial = async (
     return material.update(input);
 };
 
-export const deleteMaterial = async (id: string): Promise<boolean> => {
-    const material = await Material.findByPk(id);
+export const deleteMaterial = async (organizationId: string, id: string): Promise<boolean> => {
+    try {
+    const material = await Material.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
+    });
     if (!material) {
         return false;
     }
-    await material.destroy();
-    return true;
+        await material.destroy();
+        return true;
+    } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            throw new AppError(400, 'Material is associated with other module, please delete first from other module');
+        }
+        throw error;
+    }
 };
 
 export const listThinMaterials = async (
+    organizationId: string,
     search?: string,
 ): Promise<ThinMaterial[]> => {
     try {
@@ -201,7 +226,10 @@ export const listThinMaterials = async (
             : {};
 
         return await Material.findAll({
-            where: whereClause,
+            where: {
+                ...whereClause,
+                organization_id: organizationId,
+            },
             attributes: ['id', 'vendorId', 'materialTypeId', 'projectId'],
             order: [['createdAt', 'ASC']],
         });
@@ -212,6 +240,7 @@ export const listThinMaterials = async (
 };
 
 export const exportMaterials = async (
+    organizationId: string,
     startDate?: Date,
     endDate?: Date,
 ): Promise<ExcelJS.Buffer> => {
@@ -234,7 +263,10 @@ export const exportMaterials = async (
     }
 
     const materials = await Material.findAll({
-        where,
+        where: {
+            ...where,
+            organization_id: organizationId,
+        },
         include: [
             {
                 model: MaterialType,

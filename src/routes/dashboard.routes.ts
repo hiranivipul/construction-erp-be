@@ -1,18 +1,11 @@
 import { Router } from 'express';
 
-import { requireRole } from '@/middlewares/role.middleware';
+import { requirePermission } from '@/middlewares/permission.middleware';
 import { getState } from '@/modules/dashboard/dashboard.controller';
-import { UserRole } from '@/constants/roles';
+import { Permission } from '@/constants/permissions';
 
 const dashboardRouter = Router();
 
-dashboardRouter.get(
-    '/stats',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    getState,
-);
+dashboardRouter.get('/stats', requirePermission(Permission.DASHBOARD_READ), getState);
+
 export default dashboardRouter;

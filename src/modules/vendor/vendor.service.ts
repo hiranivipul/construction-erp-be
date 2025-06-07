@@ -3,9 +3,10 @@ import {
     VendorAttributes,
     VendorCreationAttributes,
 } from '@database/models/vendor.model';
-import { Op } from 'sequelize';
+import { ForeignKeyConstraintError, Op } from 'sequelize';
 import ExcelJS from 'exceljs';
 import { ListVendorsParams, ListVendorsResult, ThinVendor } from './vendor.dto';
+import { AppError } from '@/utils/app-error';
 
 export const createVendor = async (
     input: VendorCreationAttributes,
@@ -41,8 +42,13 @@ export const listVendors = async (
     };
 };
 
-export const getVendorById = async (id: string): Promise<Vendor | null> => {
-    return Vendor.findByPk(id);
+export const getVendorById = async (organizationId: string, id: string): Promise<Vendor | null> => {
+    return Vendor.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
+    });
 };
 
 export const updateVendor = async (
@@ -56,16 +62,29 @@ export const updateVendor = async (
     return vendor.update(input);
 };
 
-export const deleteVendor = async (id: string): Promise<boolean> => {
-    const vendor = await Vendor.findByPk(id);
+export const deleteVendor = async (organizationId: string, id: string): Promise<boolean> => {
+    try {
+    const vendor = await Vendor.findOne({
+        where: {
+            id,
+            organization_id: organizationId,
+        },
+    });
     if (!vendor) {
         return false;
     }
-    await vendor.destroy();
-    return true;
+        await vendor.destroy();
+        return true;
+    } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            throw new AppError(400, 'Vendor is associated with other module, please delete first from other module');
+        }
+        throw error;
+    }
 };
 
 export const listThinVendors = async (
+    organizationId: string,
     search?: string,
 ): Promise<ThinVendor[]> => {
     try {
@@ -78,7 +97,10 @@ export const listThinVendors = async (
             : {};
 
         return await Vendor.findAll({
-            where: whereClause,
+            where: {
+                ...whereClause,
+                organization_id: organizationId,
+            },
             attributes: ['id', 'vendor_name'],
             order: [['vendor_name', 'ASC']],
         });
@@ -89,6 +111,7 @@ export const listThinVendors = async (
 };
 
 export const exportVendors = async (
+    organizationId: string,
     startDate?: Date,
     endDate?: Date,
 ): Promise<ExcelJS.Buffer> => {
@@ -111,7 +134,10 @@ export const exportVendors = async (
     }
 
     const vendors = await Vendor.findAll({
-        where,
+        where: {
+            ...where,
+            organization_id: organizationId,
+        },
         order: [['createdAt', 'ASC']],
     });
 

@@ -13,52 +13,17 @@ import {
     createMaterialTypeSchema,
     updateMaterialTypeSchema,
 } from '@/modules/material-type/material-type.validation';
-import { requireRole } from '@/middlewares/role.middleware';
-import { UserRole } from '@/constants/roles';
+import { requirePermission } from '@/middlewares/permission.middleware';
+import { Permission } from '@/constants/permissions';
 
 const router = Router();
 
-// Create a new material type
-router.post(
-    '/',
-    requireRole(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT),
-    validateRequest(createMaterialTypeSchema),
-    create,
-);
-
-// Get all material types
-router.get(
-    '/',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    list,
-);
-router.get('/export', getExport);
-router.get('/thin', getThinMaterialTypes);
-
-// Get a material type by ID
-router.get(
-    '/:id',
-    requireRole(
-        UserRole.SUPER_ADMIN,
-        UserRole.ACCOUNTANT,
-        UserRole.PROJECT_MANAGER,
-    ),
-    getById,
-);
-
-// Update a material type
-router.put(
-    '/:id',
-    requireRole(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT),
-    validateRequest(updateMaterialTypeSchema),
-    update,
-);
-
-// Delete a material type
-router.delete('/:id', requireRole(UserRole.SUPER_ADMIN), remove);
+router.post('/',requirePermission(Permission.MATERIAL_TYPE_CREATE),validateRequest(createMaterialTypeSchema),create);
+router.get('/',requirePermission(Permission.MATERIAL_TYPE_READ),list);
+router.get('/export', requirePermission(Permission.MATERIAL_TYPE_READ), getExport);
+router.get('/thin', requirePermission(Permission.MATERIAL_TYPE_READ), getThinMaterialTypes);
+router.get('/:id',requirePermission(Permission.MATERIAL_TYPE_READ),getById);
+router.put('/:id', requirePermission(Permission.MATERIAL_TYPE_UPDATE, [Permission.MATERIAL_TYPE_READ]),validateRequest(updateMaterialTypeSchema), update);
+router.delete('/:id', requirePermission(Permission.MATERIAL_TYPE_DELETE), remove);
 
 export default router;

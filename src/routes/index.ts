@@ -8,8 +8,7 @@ import VendorRouter from './vendor.routes';
 import dashboardRouter from './dashboard.routes';
 import ExpenseRouter from './expense.routes';
 import OrganizationRouter from './organization.routes';
-import { requireRole } from '@/middlewares/role.middleware';
-import { UserRole } from '@/constants/roles';
+import PermissionRouter from './permission.routes';
 const router = express.Router();
 
 router.use('/auth', AuthRouter);
@@ -19,11 +18,7 @@ router.use('/materials', AuthMiddleware, MaterialRouter);
 router.use('/materials-type', AuthMiddleware, MaterialTypeRouter);
 router.use('/vendors', AuthMiddleware, VendorRouter);
 router.use('/expenses', AuthMiddleware, ExpenseRouter);
-router.use(
-    '/organization',
-    AuthMiddleware,
-    requireRole(UserRole.SUPER_ADMIN),
-    OrganizationRouter,
-);
+router.use('/permissions', AuthMiddleware, PermissionRouter);
+router.use('/organization', AuthMiddleware, OrganizationRouter);
 
 export default router;

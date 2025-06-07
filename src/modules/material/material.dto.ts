@@ -1,4 +1,5 @@
 export interface ListMaterialsParams {
+    organization_id: string;
     page?: number;
     limit?: number;
     search?: string;

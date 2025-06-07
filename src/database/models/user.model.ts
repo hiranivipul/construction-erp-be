@@ -15,7 +15,7 @@ export interface UserAttributes {
 
 export type UserCreationAttributes = Optional<
     UserAttributes,
-    'id' | 'avatar' | 'createdAt' | 'updatedAt'
+    'id' | 'avatar' | 'createdAt' | 'updatedAt' | 'organization_id'
 >;
 
 export class User

@@ -11,7 +11,7 @@ export interface VendorAttributes {
 
 export type VendorCreationAttributes = Optional<
     VendorAttributes,
-    'id' | 'createdAt' | 'updatedAt'
+    'id' | 'createdAt' | 'updatedAt' | 'organization_id'
 >;
 
 export class Vendor

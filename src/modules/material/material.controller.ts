@@ -10,6 +10,8 @@ import {
 } from './material.service';
 import { validateImage } from './material.validation';
 import { S3Service } from '@utils/third-party/s3/s3.service';
+import { getOrganizationId } from '@/utils/helper';
+import { AppError } from '@/utils/app-error';
 
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -26,7 +28,8 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         }
 
         req.body.billDate = new Date();
-        const material = await createMaterial(req.body);
+        const organizationId = getOrganizationId(req);
+        const material = await createMaterial({...req.body, organization_id: organizationId});
 
         // Add signed URL for receipt if present
         const materialData = material.toJSON();
@@ -44,7 +47,17 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         });
         return;
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+        if (error instanceof AppError) {
+            res.status(error.statusCode).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create material',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
         return;
     }
 };
@@ -52,8 +65,9 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const list = async (req: Request, res: Response): Promise<void> => {
     try {
         const { page, limit, search } = req.query;
-
+        const organizationId = getOrganizationId(req);
         const result = await listMaterials({
+            organization_id: organizationId,
             page: page ? parseInt(page as string) : undefined,
             limit: limit ? parseInt(limit as string) : undefined,
             search: search as string,
@@ -71,7 +85,8 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 export const getById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const material = await getMaterialById(id);
+        const organizationId = getOrganizationId(req);
+        const material = await getMaterialById(organizationId, id);
 
         if (!material) {
             res.status(404).json({ message: 'Material not found' });
@@ -100,7 +115,8 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
 export const update = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const material = await updateMaterial(id, req.body);
+        const organizationId = getOrganizationId(req);
+        const material = await updateMaterial(id, {...req.body, organization_id: organizationId});
 
         if (!material) {
             res.status(404).json({ message: 'Material not found' });
@@ -122,7 +138,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 export const remove = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const success = await deleteMaterial(id);
+        const organizationId = getOrganizationId(req);
+        const success = await deleteMaterial(organizationId, id);
 
         if (!success) {
             res.status(404).json({ message: 'Material not found' });
@@ -132,8 +149,17 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
         res.status(200).json({ message: 'Material deleted successfully' });
         return;
     } catch (error) {
-        console.error('Delete material error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        if (error instanceof AppError) {
+            res.status(error.statusCode).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete material',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
         return;
     }
 };
@@ -144,7 +170,9 @@ export const getThinMaterialTypes = async (
 ): Promise<void> => {
     try {
         const { search } = req.query;
+        const organizationId = getOrganizationId(req);
         const materialTypes = await listThinMaterials(
+            organizationId,
             search as string | undefined,
         );
         res.status(200).json({ data: materialTypes });
@@ -174,7 +202,8 @@ export const getExport = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const buffer = await exportMaterials(parsedStartDate, parsedEndDate);
+        const organizationId = getOrganizationId(req);
+        const buffer = await exportMaterials(organizationId, parsedStartDate, parsedEndDate);
 
         res.setHeader(
             'Content-Type',
